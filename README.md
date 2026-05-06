@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # ClinicaNavarroFrontendAdmin
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.7.
@@ -57,3 +58,7 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+=======
+# clinica-navarro-frontend-admin
+Frontend, se desarrolla la interfaz para el administrador, con base a  lo q se crean con el backend y respetando el prototipo 
+>>>>>>> cd8709429b21440ecdb7a486ac7d9890d6fb7929
