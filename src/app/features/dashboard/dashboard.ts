@@ -1,9 +1,23 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
+import { AuthService } from '../../core/services/auth';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [],
+  standalone: true,
+  imports: [CommonModule, RouterModule], 
   templateUrl: './dashboard.html',
-  styleUrl: './dashboard.css',
+  styleUrls: ['./dashboard.css']
 })
-export class Dashboard {}
+export class DashboardComponent {
+  private authService = inject(AuthService);
+  private router = inject(Router);
+
+  emailUsuario = this.authService.obtenerToken() ? 'Administrador' : 'Usuario';
+
+  cerrarSesion(): void {
+    this.authService.cerrarSesion();
+    this.router.navigate(['/auth']);
+  }
+}
