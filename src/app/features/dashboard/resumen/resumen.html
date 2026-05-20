@@ -1,1 +1,128 @@
-<p>resumen works!</p>
+<div class="animate-fade-in-up space-y-6">
+  
+  <div class="mb-2">
+    <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+      <span>📊</span> Reportes y Analítica
+    </h2>
+    <p class="text-gray-500 text-sm mt-1">Indicadores clave de rendimiento (KPIs) del negocio.</p>
+  </div>
+
+  @if (cargando()) {
+    <div class="flex justify-center items-center py-20">
+      <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  } @else {
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      
+      <!-- ================= GRÁFICO 1: TENDENCIA DE INGRESOS (Barras Verticales) ================= -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <h3 class="text-lg font-bold text-gray-700 mb-6 flex items-center gap-2">
+          <span>📈</span> Ingresos Brutos (Últimos 6 meses)
+        </h3>
+        
+        <div class="h-64 flex items-end justify-between gap-2 border-b border-gray-200 pb-2 relative">
+          <!-- Líneas de referencia horizontales (Diseño) -->
+          <div class="absolute w-full border-t border-gray-100 top-0"></div>
+          <div class="absolute w-full border-t border-gray-100 top-1/4"></div>
+          <div class="absolute w-full border-t border-gray-100 top-2/4"></div>
+          <div class="absolute w-full border-t border-gray-100 top-3/4"></div>
+
+          <!-- Barras de datos -->
+          @for (item of ingresos(); track item.mes) {
+            <div class="flex flex-col items-center flex-1 z-10 group">
+              <!-- Tooltip que aparece al pasar el mouse -->
+              <div class="opacity-0 group-hover:opacity-100 transition-opacity bg-gray-800 text-white text-xs py-1 px-2 rounded mb-2 whitespace-nowrap pointer-events-none">
+                S/. {{ item.total | number:'1.2-2' }}
+              </div>
+              
+              <!-- Barra de color dinámica -->
+              <div class="w-full max-w-[3rem] bg-gradient-to-t from-blue-600 to-blue-400 rounded-t-sm shadow-md transition-all duration-500 relative"
+                   [style.height.%]="calcularAlturaBarra(item.total)">
+                   <!-- Valor dentro de la barra si es alta, o arriba si es bajita -->
+                   @if (calcularAlturaBarra(item.total) > 15) {
+                     <span class="absolute top-2 w-full text-center text-white text-[10px] font-bold">
+                       {{ item.total > 0 ? (item.total/1000 | number:'1.0-1') + 'k' : '' }}
+                     </span>
+                   }
+              </div>
+              
+              <!-- Etiqueta del mes -->
+              <span class="text-[10px] text-gray-500 font-bold mt-2 text-center break-words w-full">
+                {{ item.mes.split(' ')[0] }}<br>{{ item.mes.split(' ')[1] }}
+              </span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="space-y-6">
+        
+        <!-- ================= GRÁFICO 2: TOP TRATAMIENTOS (Barras Horizontales) ================= -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <h3 class="text-lg font-bold text-gray-700 mb-6 flex items-center gap-2">
+            <span>🏆</span> Top 5 Tratamientos Realizados
+          </h3>
+          
+          <div class="space-y-4">
+            @if (topTratamientos().length === 0) {
+              <p class="text-sm text-gray-500 italic">No hay suficientes datos aún.</p>
+            }
+            
+            @for (trat of topTratamientos(); track trat.servicioNombre) {
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span class="font-bold text-gray-700">{{ trat.servicioNombre }}</span>
+                  <span class="font-bold text-indigo-600">{{ trat.cantidadAplicada }} veces</span>
+                </div>
+                <div class="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
+                  <div class="bg-gradient-to-r from-indigo-500 to-purple-500 h-2.5 rounded-full transition-all duration-700"
+                       [style.width.%]="calcularAnchoBarra(trat.cantidadAplicada)"></div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- ================= GRÁFICO 3: RENDIMIENTO DE CITAS ================= -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <h3 class="text-lg font-bold text-gray-700 mb-4 flex items-center gap-2">
+            <span>🎯</span> Tasa de Éxito de Citas
+          </h3>
+          
+          <div class="flex items-center gap-4">
+            
+            <!-- Dona simplificada con Tailwind -->
+            <div class="relative w-24 h-24 flex items-center justify-center bg-gray-100 rounded-full shadow-inner overflow-hidden border-[6px] border-white ring-2 ring-gray-100">
+               <div class="text-center z-10">
+                 <span class="text-2xl font-bold text-gray-800">{{ calcularPorcentajeCitas(resumenCitas()['Realizadas']) }}%</span>
+               </div>
+               <!-- Falso progreso (Puramente visual para decorar, ya que CSS no puede hacer arcos complejos fácil, mostramos la métrica al medio) -->
+               <div class="absolute inset-0 bg-green-200 opacity-20"></div>
+               <div class="absolute bottom-0 w-full bg-green-500 opacity-20 transition-all duration-700" [style.height.%]="calcularPorcentajeCitas(resumenCitas()['Realizadas'])"></div>
+            </div>
+
+            <!-- Leyenda de datos duros -->
+            <div class="flex-1 space-y-2">
+              <div class="flex justify-between items-center bg-green-50 px-3 py-2 rounded">
+                <span class="text-xs font-bold text-green-700 flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-green-500"></div> Realizadas</span>
+                <span class="text-sm font-bold text-green-800">{{ resumenCitas()['Realizadas'] }}</span>
+              </div>
+              
+              <div class="flex justify-between items-center bg-yellow-50 px-3 py-2 rounded">
+                <span class="text-xs font-bold text-yellow-700 flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-yellow-500"></div> Pendientes</span>
+                <span class="text-sm font-bold text-yellow-800">{{ resumenCitas()['Pendientes'] }}</span>
+              </div>
+
+              <div class="flex justify-between items-center bg-red-50 px-3 py-2 rounded">
+                <span class="text-xs font-bold text-red-700 flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-red-500"></div> Canceladas</span>
+                <span class="text-sm font-bold text-red-800">{{ resumenCitas()['Canceladas'] }}</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  }
+</div>

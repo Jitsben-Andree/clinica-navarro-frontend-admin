@@ -1,1 +1,185 @@
-<p>facturacion works!</p>
+<div class="animate-fade-in-up">
+  
+  <!-- Cabecera -->
+  <div class="mb-6">
+    <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+      <span>💰</span> Caja y Facturación
+    </h2>
+    <p class="text-gray-500 text-sm mt-1">Selecciona una cita, agrega los tratamientos realizados y procesa el cobro.</p>
+  </div>
+
+  <!-- Buscadores -->
+  <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm mb-6 flex flex-col md:flex-row gap-4">
+    <div class="flex-1">
+      <label class="block text-xs font-bold text-gray-500 uppercase mb-1">1. Buscar Paciente</label>
+      <select (change)="onPacienteChange($event)" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-blue-500 focus:border-blue-500 font-medium">
+        <option value="" disabled selected>-- Seleccione un paciente --</option>
+        @for (p of pacientes(); track p.id) {
+          <option [value]="p.id">{{ p.nombres }} {{ p.apellidos }} (DNI: {{ p.dni }})</option>
+        }
+      </select>
+    </div>
+
+    <div class="flex-1">
+      <label class="block text-xs font-bold text-gray-500 uppercase mb-1">2. Seleccionar Cita a Cobrar</label>
+      <select [disabled]="!pacienteSeleccionado()" (change)="onCitaChange($event)" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-blue-500 focus:border-blue-500 font-medium disabled:bg-gray-100">
+        <option value="" disabled selected>-- Seleccione una cita --</option>
+        @for (c of citas(); track c.id) {
+          <option [value]="c.id">{{ c.fechaHora | date:'dd/MM/yyyy h:mm a' }} (Estado: {{ c.estado }})</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <!-- Área Principal (Dos columnas si hay una cita seleccionada) -->
+  @if (citaSeleccionada()) {
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 relative" [class.opacity-50]="cargando()">
+      
+      @if (cargando()) {
+        <div class="absolute inset-0 z-10 flex justify-center items-center">
+          <div class="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      }
+
+      <!-- COLUMNA IZQUIERDA: Detalle de Tratamientos -->
+      <div class="lg:col-span-2 space-y-6">
+        
+        <!-- Formulario para agregar tratamiento (Oculto si ya se pagó) -->
+        @if (!pagoActual()) {
+          <div class="bg-blue-50 border border-blue-100 rounded-xl p-5 shadow-sm">
+            <h3 class="text-sm font-bold text-blue-800 uppercase mb-3 flex items-center gap-2">
+              <span>➕</span> Agregar Servicio Realizado
+            </h3>
+            <form [formGroup]="tratamientoForm" (ngSubmit)="agregarTratamiento()" class="flex flex-col md:flex-row gap-3 items-end">
+              <div class="flex-1 w-full">
+                <label class="block text-xs font-medium text-gray-600 mb-1">Tratamiento Catálogo</label>
+                <select formControlName="servicioId" (change)="onServicioChange($event)" class="w-full border border-blue-200 rounded px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+                  <option [value]="0" disabled>-- Elegir Tratamiento --</option>
+                  @for (s of servicios(); track s.id) {
+                    <option [value]="s.id">{{ s.nombre }} (Base: S/.{{ s.precioBase }})</option>
+                  }
+                </select>
+              </div>
+              <div class="w-full md:w-32">
+                <label class="block text-xs font-medium text-gray-600 mb-1">Cobrado (S/.)</label>
+                <input type="number" step="0.1" formControlName="precioCobrado" class="w-full border border-blue-200 rounded px-3 py-2 text-sm font-bold text-green-700 focus:ring-blue-500 focus:border-blue-500">
+              </div>
+              <div class="w-full md:w-auto">
+                <button type="submit" [disabled]="tratamientoForm.invalid" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded shadow hover:bg-blue-700 disabled:bg-blue-300 transition-colors">
+                  Añadir
+                </button>
+              </div>
+            </form>
+          </div>
+        }
+
+        <!-- Tabla de Tratamientos -->
+        <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+          <div class="px-5 py-3 border-b border-gray-100 bg-gray-50">
+            <h3 class="font-bold text-gray-700">Detalle de la Cuenta</h3>
+          </div>
+          <div class="p-0">
+            @if (tratamientos().length === 0) {
+              <div class="p-8 text-center text-gray-400 italic">No hay tratamientos registrados en esta cita.</div>
+            } @else {
+              <table class="w-full text-left">
+                <thead class="bg-gray-50 border-b border-gray-100 text-xs uppercase text-gray-500">
+                  <tr>
+                    <th class="px-5 py-3">Servicio</th>
+                    <th class="px-5 py-3 text-right">Precio (S/.)</th>
+                    @if (!pagoActual()) {
+                      <th class="px-5 py-3 text-center">Quitar</th>
+                    }
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                  @for (t of tratamientos(); track t.id) {
+                    <tr class="hover:bg-gray-50">
+                      <td class="px-5 py-3 text-sm font-medium text-gray-800">{{ t.servicioNombre }}</td>
+                      <td class="px-5 py-3 text-sm font-bold text-gray-700 text-right">{{ t.precioCobrado | number:'1.2-2' }}</td>
+                      @if (!pagoActual()) {
+                        <td class="px-5 py-3 text-center">
+                          <button (click)="eliminarTratamiento(t.id)" class="text-red-500 hover:text-red-700 transition-colors" title="Eliminar">🗑️</button>
+                        </td>
+                      }
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            }
+          </div>
+        </div>
+
+      </div>
+
+      <!-- COLUMNA DERECHA: Resumen y Pago -->
+      <div class="space-y-6">
+        
+        <!-- Tarjeta de Total -->
+        <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-6 shadow-lg text-white">
+          <p class="text-slate-400 text-sm font-medium uppercase tracking-wider mb-1">Total a Pagar</p>
+          <h2 class="text-4xl font-bold text-green-400 mb-4">S/. {{ totalAPagar() | number:'1.2-2' }}</h2>
+          <div class="h-px w-full bg-slate-700 mb-4"></div>
+          <p class="text-sm text-slate-300">Paciente: <span class="font-bold text-white">{{ citaSeleccionada()?.pacienteNombreCompleto }}</span></p>
+        </div>
+
+        <!-- Formulario de Pago (Si NO ha pagado) -->
+        @if (!pagoActual()) {
+          <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+            <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><span>💳</span> Procesar Pago</h3>
+            
+            <form [formGroup]="pagoForm" (ngSubmit)="procesarPago()" class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Método de Pago</label>
+                <select formControlName="metodoPago" class="w-full border-2 border-gray-200 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500 font-medium">
+                  <option value="" disabled>Seleccione...</option>
+                  <option value="EFECTIVO">💵 Efectivo</option>
+                  <option value="TARJETA">💳 Tarjeta (POS)</option>
+                  <option value="YAPE">📱 Yape</option>
+                  <option value="PLIN">📱 Plin</option>
+                  <option value="TRANSFERENCIA">🏦 Transferencia</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Comprobante</label>
+                <select formControlName="tipoComprobante" class="w-full border-2 border-gray-200 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500 font-medium">
+                  <option value="" disabled>Seleccione...</option>
+                  <option value="BOLETA">📄 Boleta Electrónica</option>
+                  <option value="FACTURA">🧾 Factura</option>
+                  <option value="RECIBO_INTERNO">📝 Recibo Interno</option>
+                </select>
+              </div>
+
+              <div class="pt-4">
+                <button type="submit" [disabled]="pagoForm.invalid || tratamientos().length === 0" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-colors disabled:bg-gray-400">
+                  Confirmar Cobro
+                </button>
+              </div>
+            </form>
+          </div>
+        } 
+        
+        <!-- Recibo (Si YA pagó) -->
+        @else {
+          <div class="bg-green-50 border border-green-200 rounded-xl p-6 shadow-sm text-center">
+            <div class="w-16 h-16 bg-green-500 text-white rounded-full flex items-center justify-center text-3xl mx-auto mb-3 shadow-md">✓</div>
+            <h3 class="text-xl font-bold text-green-800 mb-1">¡Cuenta Pagada!</h3>
+            <p class="text-sm text-green-700 mb-4">{{ pagoActual()?.fechaPago | date:'dd/MM/yyyy h:mm a' }}</p>
+            
+            <div class="bg-white rounded p-3 text-left space-y-2 border border-green-100 text-sm">
+              <div class="flex justify-between"><span class="text-gray-500">Método:</span> <span class="font-bold">{{ pagoActual()?.metodoPago }}</span></div>
+              <div class="flex justify-between"><span class="text-gray-500">Comprobante:</span> <span class="font-bold">{{ pagoActual()?.tipoComprobante }}</span></div>
+              <div class="flex justify-between pt-2 border-t border-gray-100"><span class="text-gray-500">Pagado:</span> <span class="font-bold text-green-700">S/. {{ pagoActual()?.montoTotal | number:'1.2-2' }}</span></div>
+            </div>
+            
+            <button class="mt-4 text-blue-600 font-bold hover:underline text-sm flex items-center justify-center w-full gap-1">
+              <span>🖨️</span> Imprimir Recibo
+            </button>
+          </div>
+        }
+
+      </div>
+    </div>
+  }
+</div>

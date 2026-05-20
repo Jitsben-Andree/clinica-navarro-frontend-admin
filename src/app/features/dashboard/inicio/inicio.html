@@ -1,0 +1,112 @@
+<div class="animate-fade-in-up space-y-6">
+  
+  <!-- Saludo -->
+  <div>
+    <h2 class="text-2xl font-bold text-gray-800">Resumen del Día</h2>
+    <p class="text-gray-500 text-sm mt-1">Aquí tienes un vistazo rápido de cómo va la clínica hoy.</p>
+  </div>
+
+  <!-- TARJETAS DE MÉTRICAS (KPIs) -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    
+    <!-- Tarjeta 1: Citas del Día -->
+    <div class="bg-white rounded-xl p-6 border border-gray-100 shadow-sm flex items-center gap-4 hover:shadow-md transition-shadow relative overflow-hidden">
+      <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-2xl z-10">📅</div>
+      <div class="z-10">
+        <p class="text-sm font-medium text-gray-500">Citas para Hoy</p>
+        <h3 class="text-2xl font-bold text-gray-800">{{ citasHoy().length }}</h3>
+      </div>
+      <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-blue-50 rounded-full opacity-50 pointer-events-none"></div>
+    </div>
+
+    <!-- Tarjeta 2: Pacientes Faltantes -->
+    <div class="bg-white rounded-xl p-6 border border-gray-100 shadow-sm flex items-center gap-4 hover:shadow-md transition-shadow relative overflow-hidden">
+      <div class="w-14 h-14 bg-yellow-100 rounded-full flex items-center justify-center text-yellow-600 text-2xl z-10">⏳</div>
+      <div class="z-10">
+        <p class="text-sm font-medium text-gray-500">Por Atender</p>
+        <h3 class="text-2xl font-bold text-gray-800">{{ getCitasPendientes() }}</h3>
+      </div>
+      <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-yellow-50 rounded-full opacity-50 pointer-events-none"></div>
+    </div>
+
+    <!-- Tarjeta 3: Total Pacientes -->
+    <div class="bg-white rounded-xl p-6 border border-gray-100 shadow-sm flex items-center gap-4 hover:shadow-md transition-shadow relative overflow-hidden">
+      <div class="w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 text-2xl z-10">👥</div>
+      <div class="z-10">
+        <p class="text-sm font-medium text-gray-500">Total Pacientes</p>
+        <h3 class="text-2xl font-bold text-gray-800">{{ totalPacientes() }}</h3>
+      </div>
+      <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-indigo-50 rounded-full opacity-50 pointer-events-none"></div>
+    </div>
+
+    <!-- Tarjeta 4: Ingresos (Fase 6) -->
+    <div class="bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl p-6 shadow-md flex items-center gap-4 text-white relative overflow-hidden hover:scale-[1.02] transition-transform">
+      <div class="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center text-2xl z-10 backdrop-blur-sm">💰</div>
+      <div class="z-10">
+        <p class="text-sm font-medium text-green-50">Ingresos de Hoy</p>
+        <h3 class="text-2xl font-bold tracking-tight">S/. {{ ingresosHoy() | number:'1.2-2' }}</h3>
+      </div>
+      <div class="absolute top-0 right-0 p-2 opacity-30 text-xs">Fase 6</div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN INFERIOR: AGENDA DEL DÍA -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mt-6">
+    <div class="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+      <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+        <span>⏰</span> Próximas Atenciones de Hoy
+      </h3>
+      <a routerLink="/dashboard/citas" class="text-sm font-semibold text-blue-600 hover:text-blue-800 hover:underline">Ir a la Agenda Completa &rarr;</a>
+    </div>
+
+    <div class="p-0">
+      @if (cargando()) {
+        <div class="p-10 text-center text-gray-500 flex flex-col items-center">
+          <div class="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-3"></div>
+          Cargando agenda del día...
+        </div>
+      } @else if (citasHoy().length === 0) {
+        <div class="p-12 text-center text-gray-500">
+          <span class="text-4xl block mb-3">🏖️</span>
+          <p class="text-lg font-medium text-gray-600">No hay citas programadas para el día de hoy.</p>
+          <p class="text-sm mt-1">Es un buen momento para organizar inventario o descansar.</p>
+        </div>
+      } @else {
+        <div class="divide-y divide-gray-100">
+          @for (cita of citasHoy(); track cita.id) {
+            <div class="p-4 hover:bg-blue-50/50 transition-colors flex items-center justify-between gap-4">
+              
+              <!-- Hora -->
+              <div class="flex flex-col items-center justify-center w-20 p-2 bg-blue-50 rounded-lg border border-blue-100">
+                <span class="text-lg font-bold text-blue-800 leading-none">{{ cita.fechaHora | date:'h:mm' }}</span>
+                <span class="text-xs font-bold text-blue-500 uppercase">{{ cita.fechaHora | date:'a' }}</span>
+              </div>
+
+              <!-- Info Paciente -->
+              <div class="flex-1 min-w-0">
+                <h4 class="text-base font-bold text-gray-800 truncate">{{ cita.pacienteNombreCompleto }}</h4>
+                <p class="text-sm text-gray-500 truncate flex items-center gap-1">
+                  <span class="text-xs">🦷</span> Dr. {{ cita.odontologoNombreCompleto }} | {{ cita.motivo }}
+                </p>
+              </div>
+
+              <!-- Estado -->
+              <div class="hidden md:block">
+                <span class="px-3 py-1 rounded-full text-xs font-bold" [ngClass]="getColorEstado(cita.estado)">
+                  {{ cita.estado }}
+                </span>
+              </div>
+
+              <!-- Botón Acción Directa -->
+              <div>
+                <a routerLink="/dashboard/clinico" class="px-4 py-2 bg-white border border-gray-200 shadow-sm text-sm font-bold text-gray-700 rounded-lg hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 transition-all whitespace-nowrap">
+                  Atender
+                </a>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>
