@@ -8,7 +8,7 @@ import { Cita } from '../../shared/interfaces/cita.dto';
 })
 export class CitaService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:8080/api/citas';
+  private readonly apiUrl = 'http://217.216.94.194:8080/api/citas';
 
   listarTodas(): Observable<Cita[]> {
     return this.http.get<Cita[]>(this.apiUrl);
