@@ -1,337 +1,204 @@
-<div
-  class="flex h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20 font-sans overflow-hidden"
->
-  <!-- ================= SIDEBAR (Menú Lateral Premium) ================= -->
-  <aside
-    class="w-72 bg-gradient-to-b from-slate-800 via-slate-800 to-slate-900 text-white flex flex-col shadow-2xl z-10 relative"
-  >
-    <!-- Patrón decorativo de fondo -->
-    <div class="absolute inset-0 opacity-5 pointer-events-none">
-      <div
-        class="absolute inset-0"
-        style="
-          background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 1px);
-          background-size: 30px 30px;
-        "
-      ></div>
-    </div>
+<!-- Contenedor principal con fondo suave y separación -->
+<div class="flex h-screen bg-slate-100 font-sans overflow-hidden p-4 gap-4 selection:bg-blue-500 selection:text-white">
+  
+  <!-- BARRA LATERAL (SIDEBAR) -->
+  <aside class="w-72 bg-slate-900 text-white flex flex-col rounded-[2rem] shadow-2xl z-10 relative overflow-hidden border border-slate-800">
+    
+    <!-- Luces de fondo (Glow effects) -->
+    <div class="absolute -top-24 -left-24 w-64 h-64 bg-blue-600/20 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-24 -right-24 w-64 h-64 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none"></div>
 
-    <!-- Logo / Marca Premium -->
-    <div
-      class="relative h-20 flex items-center justify-center border-b border-white/10 bg-white/5 backdrop-blur-sm"
-    >
-      <div class="flex items-center gap-3">
-        <div
-          class="w-8 h-8 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-lg flex items-center justify-center shadow-lg"
-        >
-          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="1.5"
-              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-            ></path>
-          </svg>
+    <!-- Cabecera de la Marca -->
+    <div class="relative h-24 flex items-center justify-center border-b border-white/5 bg-white/5 backdrop-blur-md px-6 z-10">
+      <div class="flex items-center gap-3.5">
+        <!-- Ícono abstracto de clínica -->
+        <div class="flex flex-col gap-1 drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]">
+          <div class="w-5 h-3 bg-blue-400 rounded-sm transform -skew-x-12"></div>
+          <div class="w-5 h-3 bg-indigo-400 rounded-sm transform -skew-x-12 translate-x-1.5"></div>
         </div>
-        <h1
-          class="text-xl font-bold tracking-wide bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent"
-        >
-          Clínica Navarro
-        </h1>
+        <div>
+          <h1 class="text-xl font-black tracking-widest text-white uppercase leading-none mt-1">Navarro</h1>
+          <span class="text-[10px] text-blue-300 font-bold tracking-[0.2em] uppercase">Clínica Dental</span>
+        </div>
       </div>
-      <div
-        class="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-blue-400 to-transparent"
-      ></div>
     </div>
 
-    <!-- Navegación Mejorada -->
-    <nav class="flex-1 px-4 py-8 space-y-1.5 overflow-y-auto relative">
-      <!-- Inicio (Visible para todos) -->
+    <!-- Menú de Navegación -->
+    <nav class="flex-1 px-5 py-6 space-y-1.5 overflow-y-auto custom-scrollbar relative z-10">
+      
+      <!-- Inicio -->
       <a
         routerLink="/dashboard"
-        routerLinkActive="active-link bg-white/10 border-l-4 border-blue-400"
+        routerLinkActive="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25 border-white/10"
         [routerLinkActiveOptions]="{ exact: true }"
-        class="nav-link flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200 group"
+        class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 border border-transparent transition-all duration-300 group text-sm font-semibold tracking-wide"
       >
-        <svg
-          class="w-5 h-5 group-hover:scale-110 transition-transform"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="1.5"
-            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-          ></path>
+        <svg class="w-5 h-5 transition-transform duration-300 group-hover:scale-110 group-hover:text-blue-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
         </svg>
-        <span class="font-medium">Inicio</span>
+        <span>Inicio</span>
       </a>
 
-      <!-- Pacientes (Visible para todos los trabajadores) -->
+      <!-- Pacientes -->
       <a
         routerLink="/dashboard/pacientes"
-        routerLinkActive="active-link bg-white/10 border-l-4 border-blue-400"
-        class="nav-link flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200 group"
+        routerLinkActive="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25 border-white/10"
+        class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 border border-transparent transition-all duration-300 group text-sm font-semibold tracking-wide"
       >
-        <svg
-          class="w-5 h-5 group-hover:scale-110 transition-transform"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="1.5"
-            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-          ></path>
+        <svg class="w-5 h-5 transition-transform duration-300 group-hover:scale-110 group-hover:text-blue-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
         </svg>
-        <span class="font-medium">Pacientes</span>
+        <span>Pacientes</span>
       </a>
 
-      <!-- Citas (Visible para todos los trabajadores) -->
+      <!-- Citas -->
       <a
         routerLink="/dashboard/citas"
-        routerLinkActive="active-link bg-white/10 border-l-4 border-blue-400"
-        class="nav-link flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200 group"
+        routerLinkActive="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25 border-white/10"
+        class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 border border-transparent transition-all duration-300 group text-sm font-semibold tracking-wide"
       >
-        <svg
-          class="w-5 h-5 group-hover:scale-110 transition-transform"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="1.5"
-            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-          ></path>
+        <svg class="w-5 h-5 transition-transform duration-300 group-hover:scale-110 group-hover:text-blue-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5 21h13.5a2.25 2.25 0 0 0 2.25-2.25m-18 0V7.5M21 7.5v11.25M9 10.5h.008v.008H9V10.5Zm3 0h.008v.008H12V10.5Zm3 0h.008v.008H15V10.5Zm-6 3h.008v.008H9v-.008Zm3 0h.008v.008H12v-.008Zm3 0h.008v.008H15v-.008Zm-6 3h.008v.008H9v-.008Zm3 0h.008v.008H12v-.008Zm3 0h.008v.008H15v-.008Z" />
         </svg>
-        <span class="font-medium">Citas</span>
+        <span>Citas y Agenda</span>
       </a>
 
-      <!-- Clínico (Solo Admin y Odontólogo) -->
       @if (rolUsuario === 'ROLE_ADMIN' || rolUsuario === 'ROLE_ODONTOLOGO') {
+        <!-- Clínico -->
         <a
           routerLink="/dashboard/clinico"
-          routerLinkActive="active-link bg-white/10 border-l-4 border-blue-400"
-          class="nav-link flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200 group"
+          routerLinkActive="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25 border-white/10"
+          class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 border border-transparent transition-all duration-300 group text-sm font-semibold tracking-wide"
         >
-          <svg
-            class="w-5 h-5 group-hover:scale-110 transition-transform"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="1.5"
-              d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
-            ></path>
+          <svg class="w-5 h-5 transition-transform duration-300 group-hover:scale-110 group-hover:text-blue-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.03 0 1.9.693 2.166 1.638m-7.377 0A48.536 48.536 0 0 1 12 3m0 0c-1.102 0-2.19.037-3.268.108m3.268-1.108c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h1.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664M9 2.25H7.5a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 20.25h5.4M9 12h.008v.008H9V12Zm0 3h.008v.008H9V15Zm0 3h.008v.008H9V18Z" />
           </svg>
-          <span class="font-medium">Módulo Clínico</span>
+          <span>Módulo Clínico</span>
         </a>
       }
 
-      <!-- Precios / Catálogo (Solo Admin y Recepcionista) -->
       @if (rolUsuario === 'ROLE_ADMIN' || rolUsuario === 'ROLE_RECEPCIONISTA') {
+        <!-- Catálogo -->
         <a
           routerLink="/dashboard/catalogo"
-          routerLinkActive="active-link bg-white/10 border-l-4 border-blue-400"
-          class="nav-link flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200 group"
+          routerLinkActive="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25 border-white/10"
+          class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 border border-transparent transition-all duration-300 group text-sm font-semibold tracking-wide"
         >
-          <svg
-            class="w-5 h-5 group-hover:scale-110 transition-transform"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="1.5"
-              d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            ></path>
+          <svg class="w-5 h-5 transition-transform duration-300 group-hover:scale-110 group-hover:text-blue-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.854-1.106-2.24 0-3.093 1.123-.865 2.943-.865 4.066 0l.86.665M18.5 12a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z" />
           </svg>
-          <span class="font-medium">Precios</span>
+          <span>Catálogo y Precios</span>
         </a>
       }
 
-      <!-- Inventario (Solo Admin) -->
       @if (rolUsuario === 'ROLE_ADMIN') {
+        <!-- Personal -->
+        <a
+          routerLink="/dashboard/usuarios"
+          routerLinkActive="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25 border-white/10"
+          class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 border border-transparent transition-all duration-300 group text-sm font-semibold tracking-wide"
+        >
+          <svg class="w-5 h-5 transition-transform duration-300 group-hover:scale-110 group-hover:text-blue-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0A9 9 0 1 0 12 21a9 9 0 0 0 5.982-2.275Zm-5.982-10.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+          </svg>
+          <span>Personal Médico</span>
+        </a>
+
+        <!-- Inventario -->
         <a
           routerLink="/dashboard/inventario"
-          routerLinkActive="active-link bg-white/10 border-l-4 border-blue-400"
-          class="nav-link flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200 group"
+          routerLinkActive="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25 border-white/10"
+          class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 border border-transparent transition-all duration-300 group text-sm font-semibold tracking-wide"
         >
-          <svg
-            class="w-5 h-5 group-hover:scale-110 transition-transform"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="1.5"
-              d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-            ></path>
+          <svg class="w-5 h-5 transition-transform duration-300 group-hover:scale-110 group-hover:text-blue-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-10.5v10.5" />
           </svg>
-          <span class="font-medium">Inventario</span>
+          <span>Inventario</span>
         </a>
-      }
 
-      <!-- Estadísticas (Solo Admin) -->
-      @if (rolUsuario === 'ROLE_ADMIN') {
+        <!-- Estadísticas -->
         <a
           routerLink="/dashboard/resumen"
-          routerLinkActive="active-link bg-white/10 border-l-4 border-purple-400 text-white"
-          class="nav-link flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200 group"
+          routerLinkActive="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25 border-white/10"
+          class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 border border-transparent transition-all duration-300 group text-sm font-semibold tracking-wide"
         >
-          <svg
-            class="w-5 h-5 group-hover:scale-110 transition-transform"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="1.5"
-              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-            ></path>
+          <svg class="w-5 h-5 transition-transform duration-300 group-hover:scale-110 group-hover:text-blue-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0 0 20.25 18V6A2.25 2.25 0 0 0 18 3.75H6A2.25 2.25 0 0 0 3.75 6v12A2.25 2.25 0 0 0 6 20.25Z" />
           </svg>
-          <span class="font-medium">Estadísticas</span>
+          <span>Estadísticas</span>
         </a>
       }
 
-      <!-- Caja / Pagos (Solo Admin y Recepcionista) -->
       @if (rolUsuario === 'ROLE_ADMIN' || rolUsuario === 'ROLE_RECEPCIONISTA') {
+        <!-- Facturación -->
         <a
           routerLink="/dashboard/facturacion"
-          routerLinkActive="active-link bg-white/10 border-l-4 border-green-400 text-white"
-          class="nav-link flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-all duration-200 group"
+          routerLinkActive="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25 border-white/10"
+          class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 border border-transparent transition-all duration-300 group text-sm font-semibold tracking-wide"
         >
-          <svg
-            class="w-5 h-5 group-hover:scale-110 transition-transform"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="1.5"
-              d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            ></path>
+          <svg class="w-5 h-5 transition-transform duration-300 group-hover:scale-110 group-hover:text-blue-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5zm19.5 0h.008v.008H23.25V18Z" />
           </svg>
-          <span class="font-medium">Caja / Pagos</span>
+          <span>Caja y Pagos</span>
         </a>
       }
-
-      <!-- Separador decorativo -->
-      <div class="my-6 border-t border-white/10"></div>
-
-      <!-- Ayuda / Soporte -->
-      <a
-        href="#"
-        class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-all duration-200 group"
-      >
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="1.5"
-            d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"
-          ></path>
-        </svg>
-        <span class="font-medium">Ayuda</span>
-      </a>
     </nav>
 
-    <!-- Perfil y Salida Mejorado -->
-    <div class="relative p-5 border-t border-white/10 bg-white/5 backdrop-blur-sm">
-      <!-- Información del usuario -->
-      <div class="flex items-center gap-3 mb-4 p-2 rounded-lg bg-white/5">
-        <div
-          class="w-10 h-10 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full flex items-center justify-center shadow-lg"
-        >
-          <span class="text-white font-bold text-sm">
-            {{ emailUsuario.charAt(0).toUpperCase() }}
-          </span>
+    <!-- Perfil y Logout -->
+    <div class="p-5 border-t border-white/5 bg-white/5 backdrop-blur-md relative z-10">
+      <div class="flex items-center gap-3 mb-4 p-3 rounded-2xl bg-slate-800/50 border border-white/5 shadow-inner">
+        <div class="w-10 h-10 bg-gradient-to-tr from-blue-500 to-indigo-500 rounded-full flex items-center justify-center shadow-lg font-bold text-sm text-white">
+          {{ emailUsuario.charAt(0).toUpperCase() }}
         </div>
-        <div class="flex-1">
-          <p class="text-sm font-medium text-white">{{ emailUsuario }}</p>
-          <p class="text-xs text-slate-400">
-            {{
-              rolUsuario === 'ROLE_ADMIN'
-                ? 'Administrador'
-                : rolUsuario === 'ROLE_RECEPCIONISTA'
-                  ? 'Recepcionista'
-                  : 'Odontólogo'
-            }}
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-bold text-white truncate" [title]="emailUsuario">{{ emailUsuario }}</p>
+          <p class="text-[11px] text-blue-300 font-semibold tracking-wider mt-0.5 uppercase">
+            {{ getNombreRol() }}
           </p>
         </div>
-        <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
       </div>
 
-      <!-- Botón Cerrar Sesión -->
       <button
         (click)="cerrarSesion()"
-        class="w-full flex items-center justify-center gap-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 px-4 py-2.5 rounded-lg text-red-400 hover:text-red-300 text-sm font-semibold transition-all duration-200 group"
+        class="w-full flex items-center justify-center gap-2 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 px-4 py-3 rounded-xl text-rose-400 hover:text-rose-300 text-sm font-bold tracking-wide transition-all duration-300"
       >
-        <svg
-          class="w-4 h-4 group-hover:translate-x-1 transition-transform"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-          ></path>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
         </svg>
         <span>Cerrar Sesión</span>
       </button>
     </div>
   </aside>
 
-  <!-- ================= CONTENIDO PRINCIPAL ================= -->
-  <main class="flex-1 flex flex-col overflow-hidden relative">
-    <!-- Header superior mejorado -->
-    <header
-      class="h-16 bg-white/80 backdrop-blur-md shadow-sm flex items-center justify-between px-8 border-b border-slate-200/50 z-0"
-    >
+  <!-- CONTENEDOR PRINCIPAL DERECHO -->
+  <main class="flex-1 flex flex-col overflow-hidden bg-white rounded-[2rem] shadow-xl border border-slate-200 relative">
+    
+    <!-- Cabecera Superior -->
+    <header class="h-20 bg-white/80 backdrop-blur-xl flex items-center justify-between px-8 border-b border-slate-100 z-20 flex-shrink-0">
       <div>
-        <h2
-          class="text-lg font-semibold bg-gradient-to-r from-slate-700 to-slate-800 bg-clip-text text-transparent"
-        >
-          Panel Administrativo
+        <h2 class="text-xl font-black bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent tracking-tight">
+          Panel de Control
         </h2>
-        <p class="text-xs text-slate-400 mt-0.5">Bienvenido al sistema de gestión</p>
+        <p class="text-xs text-slate-400 font-medium mt-1">Gestión clínica y operativa centralizada</p>
       </div>
 
-      <!-- Indicadores rápidos -->
-      <div class="flex items-center gap-4">
-        <div class="flex items-center gap-2 text-xs text-slate-500">
-          <div class="w-2 h-2 bg-green-500 rounded-full"></div>
-          <span>Sistema operativo</span>
+      <div class="flex items-center gap-5">
+        <div class="flex items-center gap-2 bg-emerald-50 border border-emerald-100 px-3.5 py-1.5 rounded-full text-xs text-emerald-600 font-bold tracking-wide shadow-sm">
+          <span class="relative flex h-2.5 w-2.5">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+          </span>
+          <span>En línea</span>
         </div>
         <div class="w-px h-6 bg-slate-200"></div>
-        <div class="text-xs text-slate-400">
+        <div class="text-sm text-slate-600 font-semibold bg-slate-50 border border-slate-100 px-5 py-1.5 rounded-full shadow-sm capitalize">
           {{ fechaActual }}
         </div>
       </div>
     </header>
 
-    <!-- ÁREA DINÁMICA con fondo sutil -->
-    <div class="flex-1 overflow-auto p-8 bg-gradient-to-br from-slate-50 via-white to-indigo-50/30">
+    <!-- Área de las Vistas (Routing) -->
+    <div class="flex-1 overflow-auto p-8 bg-slate-50/50 main-scrollbar">
       <router-outlet></router-outlet>
     </div>
   </main>

@@ -11,6 +11,8 @@ import { CitasComponent } from './features/dashboard/citas/citas';
 import { ClinicoComponent } from './features/dashboard/clinico/clinico';
 import { FacturacionComponent } from './features/dashboard/facturacion/facturacion';
 import { ResumenComponent } from './features/dashboard/resumen/resumen';
+import { UsuariosComponent } from './features/dashboard/usuarios/usuarios';
+import { InventarioComponent } from './features/dashboard/inventario/inventario';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'auth', pathMatch: 'full' },
@@ -31,6 +33,8 @@ export const routes: Routes = [
       { path: 'clinico', component: ClinicoComponent },
       { path: 'facturacion', component: FacturacionComponent },
       { path: 'resumen', component: ResumenComponent },
+      { path: 'usuarios', component: UsuariosComponent },
+      { path: 'inventario', component: InventarioComponent },
     ]
   } 
 ];

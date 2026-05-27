@@ -1,1 +1,147 @@
-<p>usuarios works!</p>
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+  
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h2 class="text-2xl font-bold text-gray-800">Personal de la Clínica</h2>
+      <p class="text-gray-500 text-sm mt-1">Gestiona Odontólogos y Recepcionistas (Sus cuentas web se crearán automáticamente).</p>
+    </div>
+    <button (click)="abrirModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium shadow flex items-center gap-2 transition-colors">
+      <span>➕</span> Nuevo Empleado
+    </button>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse">
+      <thead>
+        <tr class="bg-gray-50 border-b border-gray-200 text-gray-600 text-sm">
+          <th class="p-3 font-semibold">Nombres y Apellidos</th>
+          <th class="p-3 font-semibold">Rol</th>
+          <th class="p-3 font-semibold">Especialidad / CMP</th>
+          <th class="p-3 font-semibold">Estado Cuenta</th>
+          <th class="p-3 font-semibold text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        
+        @if (cargando()) {
+          <tr><td colspan="5" class="p-8 text-center text-gray-500">Cargando personal...</td></tr>
+        } @else if (empleados().length === 0) {
+          <tr><td colspan="5" class="p-8 text-center text-gray-500">No hay personal registrado aún.</td></tr>
+        } @else {
+          @for (emp of empleados(); track emp.id) {
+            <tr class="hover:bg-blue-50 transition-colors">
+              <td class="p-3">
+                <div class="font-medium text-gray-800">{{ emp.nombres }} {{ emp.apellidos }}</div>
+                <div class="text-xs text-blue-600">{{ emp.email }}</div>
+              </td>
+              <td class="p-3">
+                <span class="px-2 py-1 rounded-full text-xs font-bold"
+                      [ngClass]="emp.rolNombre === 'ROLE_ODONTOLOGO' ? 'bg-indigo-100 text-indigo-800 border border-indigo-200' : 'bg-orange-100 text-orange-800 border border-orange-200'">
+                  {{ emp.rolNombre === 'ROLE_ODONTOLOGO' ? '👨‍⚕️ Odontólogo' : '👩‍💼 Recepción' }}
+                </span>
+              </td>
+              <td class="p-3 text-sm text-gray-700">
+                @if (emp.rolNombre === 'ROLE_ODONTOLOGO') {
+                  <span class="font-bold">{{ emp.especialidadNombre }}</span><br>
+                  <span class="text-xs text-gray-500">CMP: {{ emp.cmpColegiatura }}</span>
+                } @else {
+                  <span class="text-gray-400 italic">No aplica</span>
+                }
+              </td>
+              <td class="p-3">
+                <span class="px-2 py-1 rounded text-xs font-bold"
+                      [class.bg-green-100]="emp.estadoActivo" [class.text-green-700]="emp.estadoActivo"
+                      [class.bg-red-100]="!emp.estadoActivo" [class.text-red-700]="!emp.estadoActivo">
+                  {{ emp.estadoActivo ? 'ACTIVO' : 'INACTIVO' }}
+                </span>
+              </td>
+              <td class="p-3 text-center">
+                <button (click)="cambiarEstado(emp)" class="text-red-500 hover:text-red-700 p-1" title="Activar/Desactivar Acceso">🔄</button>
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- MODAL REGISTRO DE EMPLEADO -->
+@if (mostrarModal()) {
+  <div class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      
+      <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+        <h3 class="text-lg font-bold text-gray-800">Registrar Nuevo Empleado</h3>
+        <button (click)="cerrarModal()" class="text-gray-400 hover:text-red-500 font-bold text-xl">&times;</button>
+      </div>
+
+      <div class="p-6 overflow-y-auto">
+        <div class="bg-blue-50 text-blue-800 text-sm p-3 rounded mb-4 border border-blue-200">
+          ℹ️ <b>La cuenta web se creará automáticamente.</b> Su contraseña inicial será su DNI.
+        </div>
+
+        <form [formGroup]="empleadoForm" id="formEmpleado" (ngSubmit)="guardarEmpleado()" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Rol en el Sistema *</label>
+            <select formControlName="rolNombre" class="w-full border-2 border-indigo-200 rounded px-3 py-2 focus:ring-indigo-500 bg-indigo-50 font-bold">
+              <option value="ROLE_RECEPCIONISTA">Recepcionista</option>
+              <option value="ROLE_ODONTOLOGO">Odontólogo / Especialista</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Nombres *</label>
+            <input type="text" formControlName="nombres" class="w-full border border-gray-300 rounded px-3 py-2">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Apellidos *</label>
+            <input type="text" formControlName="apellidos" class="w-full border border-gray-300 rounded px-3 py-2">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">DNI (Documento) *</label>
+            <input type="text" formControlName="dni" class="w-full border border-gray-300 rounded px-3 py-2">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+            <input type="text" formControlName="telefono" class="w-full border border-gray-300 rounded px-3 py-2">
+          </div>
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico *</label>
+            <input type="email" formControlName="email" class="w-full border border-gray-300 rounded px-3 py-2">
+          </div>
+
+          <!-- Campos exclusivos para Médicos -->
+          @if (empleadoForm.get('rolNombre')?.value === 'ROLE_ODONTOLOGO') {
+            <div class="md:col-span-2 bg-gray-50 p-4 rounded border border-gray-200 grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+              <h4 class="md:col-span-2 font-bold text-gray-700 border-b pb-1">Datos Médicos</h4>
+              
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">CMP (Colegiatura) *</label>
+                <input type="text" formControlName="cmpColegiatura" class="w-full border border-gray-300 rounded px-3 py-2">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Especialidad Principal *</label>
+                <select formControlName="especialidadId" class="w-full border border-gray-300 rounded px-3 py-2">
+                  <option [value]="1">Odontología General</option>
+                  <option [value]="2">Ortodoncia</option>
+                  <option [value]="3">Odontopediatría</option>
+                  <option [value]="4">Endodoncia</option>
+                </select>
+              </div>
+            </div>
+          }
+        </form>
+      </div>
+
+      <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end gap-3">
+        <button (click)="cerrarModal()" type="button" class="px-4 py-2 bg-white border border-gray-300 rounded text-gray-700 font-medium">Cancelar</button>
+        <button form="formEmpleado" type="submit" [disabled]="empleadoForm.invalid" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 font-medium disabled:bg-blue-300">
+          Guardar Empleado
+        </button>
+      </div>
+
+    </div>
+  </div>
+}

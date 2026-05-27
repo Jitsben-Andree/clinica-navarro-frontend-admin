@@ -1,82 +1,94 @@
 <div class="animate-fade-in-up space-y-6">
   
-  <div class="mb-2">
-    <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
-      <span>📊</span> Reportes y Analítica
+  <div class="mb-4">
+    <h2 class="text-3xl font-black bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent flex items-center gap-3">
+      <span class="text-3xl drop-shadow-sm">📊</span> Analítica y Rendimiento
     </h2>
-    <p class="text-gray-500 text-sm mt-1">Indicadores clave de rendimiento (KPIs) del negocio.</p>
+    <p class="text-slate-500 text-sm mt-1 font-medium">Indicadores clave de rendimiento (KPIs) en tiempo real.</p>
   </div>
 
   @if (cargando()) {
-    <div class="flex justify-center items-center py-20">
-      <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+    <div class="flex flex-col justify-center items-center py-32">
+      <div class="w-14 h-14 border-4 border-blue-500/30 border-t-blue-600 rounded-full animate-spin drop-shadow-md"></div>
+      <p class="text-slate-400 mt-4 font-medium animate-pulse">Procesando métricas...</p>
     </div>
   } @else {
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
       
       <!-- ================= GRÁFICO 1: TENDENCIA DE INGRESOS (Barras Verticales) ================= -->
-      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-        <h3 class="text-lg font-bold text-gray-700 mb-6 flex items-center gap-2">
-          <span>📈</span> Ingresos Brutos (Últimos 6 meses)
+      <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8 relative overflow-hidden">
+        <!-- Decoración de fondo -->
+        <div class="absolute -top-24 -right-24 w-48 h-48 bg-blue-50 rounded-full blur-3xl pointer-events-none"></div>
+
+        <h3 class="text-lg font-bold text-slate-800 mb-8 flex items-center gap-2 relative z-10">
+          <span class="p-2 bg-blue-50 text-blue-600 rounded-lg">📈</span> Ingresos Brutos (Últimos 6 meses)
         </h3>
         
-        <div class="h-64 flex items-end justify-between gap-2 border-b border-gray-200 pb-2 relative">
+        <div class="h-72 flex items-end justify-between gap-4 border-b-2 border-slate-100 pb-2 relative z-10 mt-4">
           <!-- Líneas de referencia horizontales (Diseño) -->
-          <div class="absolute w-full border-t border-gray-100 top-0"></div>
-          <div class="absolute w-full border-t border-gray-100 top-1/4"></div>
-          <div class="absolute w-full border-t border-gray-100 top-2/4"></div>
-          <div class="absolute w-full border-t border-gray-100 top-3/4"></div>
+          <div class="absolute w-full border-t border-slate-100 top-0"></div>
+          <div class="absolute w-full border-t border-slate-100 top-1/4"></div>
+          <div class="absolute w-full border-t border-slate-100 top-2/4"></div>
+          <div class="absolute w-full border-t border-slate-100 top-3/4"></div>
 
           <!-- Barras de datos -->
           @for (item of ingresos(); track item.mes) {
-            <div class="flex flex-col items-center flex-1 z-10 group">
-              <!-- Tooltip que aparece al pasar el mouse -->
-              <div class="opacity-0 group-hover:opacity-100 transition-opacity bg-gray-800 text-white text-xs py-1 px-2 rounded mb-2 whitespace-nowrap pointer-events-none">
-                S/. {{ item.total | number:'1.2-2' }}
+            <div class="flex flex-col items-center flex-1 z-10 group cursor-pointer h-full justify-end relative">
+              
+              <!-- Tooltip Premium que aparece al pasar el mouse -->
+              <div class="absolute bottom-full mb-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 bg-slate-800 text-white text-xs py-2 px-3 rounded-lg shadow-xl whitespace-nowrap pointer-events-none z-20 flex flex-col items-center">
+                <span class="text-slate-400 text-[10px] uppercase tracking-wider mb-0.5">{{ item.mes }}</span>
+                <span class="font-bold text-sm text-emerald-400">S/. {{ item.total | number:'1.2-2' }}</span>
+                <div class="absolute -bottom-1 w-2 h-2 bg-slate-800 rotate-45"></div>
               </div>
               
-              <!-- Barra de color dinámica -->
-              <div class="w-full max-w-[3rem] bg-gradient-to-t from-blue-600 to-blue-400 rounded-t-sm shadow-md transition-all duration-500 relative"
+              <!-- Barra de color dinámica con efecto Glow -->
+              <div class="w-full max-w-[3.5rem] bg-gradient-to-t from-blue-600 to-indigo-400 rounded-t-xl shadow-[0_0_15px_rgba(59,130,246,0.3)] group-hover:shadow-[0_0_20px_rgba(99,102,241,0.5)] group-hover:brightness-110 transition-all duration-500 relative min-h-[4px]"
                    [style.height.%]="calcularAlturaBarra(item.total)">
-                   <!-- Valor dentro de la barra si es alta, o arriba si es bajita -->
-                   @if (calcularAlturaBarra(item.total) > 15) {
-                     <span class="absolute top-2 w-full text-center text-white text-[10px] font-bold">
-                       {{ item.total > 0 ? (item.total/1000 | number:'1.0-1') + 'k' : '' }}
-                     </span>
-                   }
+                   
+                   <!-- Destello superior en la barra -->
+                   <div class="absolute top-0 w-full h-2 bg-white/20 rounded-t-xl"></div>
               </div>
               
               <!-- Etiqueta del mes -->
-              <span class="text-[10px] text-gray-500 font-bold mt-2 text-center break-words w-full">
-                {{ item.mes.split(' ')[0] }}<br>{{ item.mes.split(' ')[1] }}
+              <span class="text-xs text-slate-500 font-semibold mt-3 text-center break-words w-full group-hover:text-blue-600 transition-colors">
+                {{ item.mes.split(' ')[0] }}<br>
+                <span class="text-[10px] font-normal text-slate-400">{{ item.mes.split(' ')[1] }}</span>
               </span>
             </div>
           }
         </div>
       </div>
 
-      <div class="space-y-6">
+      <div class="space-y-8">
         
         <!-- ================= GRÁFICO 2: TOP TRATAMIENTOS (Barras Horizontales) ================= -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <h3 class="text-lg font-bold text-gray-700 mb-6 flex items-center gap-2">
-            <span>🏆</span> Top 5 Tratamientos Realizados
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8 relative overflow-hidden">
+          <div class="absolute -top-24 -right-24 w-48 h-48 bg-purple-50 rounded-full blur-3xl pointer-events-none"></div>
+
+          <h3 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2 relative z-10">
+            <span class="p-2 bg-purple-50 text-purple-600 rounded-lg">🏆</span> Top 5 Tratamientos
           </h3>
           
-          <div class="space-y-4">
+          <div class="space-y-5 relative z-10">
             @if (topTratamientos().length === 0) {
-              <p class="text-sm text-gray-500 italic">No hay suficientes datos aún.</p>
+              <div class="p-4 bg-slate-50 rounded-xl text-center border border-dashed border-slate-200">
+                <p class="text-sm text-slate-500 font-medium">No hay suficientes datos registrados aún.</p>
+              </div>
             }
             
             @for (trat of topTratamientos(); track trat.servicioNombre) {
-              <div>
-                <div class="flex justify-between text-xs mb-1">
-                  <span class="font-bold text-gray-700">{{ trat.servicioNombre }}</span>
-                  <span class="font-bold text-indigo-600">{{ trat.cantidadAplicada }} veces</span>
+              <div class="group">
+                <div class="flex justify-between text-sm mb-1.5">
+                  <span class="font-bold text-slate-700 group-hover:text-purple-700 transition-colors">{{ trat.servicioNombre }}</span>
+                  <span class="font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md text-xs">{{ trat.cantidadAplicada }} px</span>
                 </div>
-                <div class="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
-                  <div class="bg-gradient-to-r from-indigo-500 to-purple-500 h-2.5 rounded-full transition-all duration-700"
-                       [style.width.%]="calcularAnchoBarra(trat.cantidadAplicada)"></div>
+                <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden shadow-inner">
+                  <div class="bg-gradient-to-r from-indigo-500 to-purple-500 h-full rounded-full transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(168,85,247,0.5)] relative"
+                       [style.width.%]="calcularAnchoBarra(trat.cantidadAplicada)">
+                       <!-- Destello en la barra -->
+                       <div class="absolute top-0 right-0 bottom-0 w-8 bg-gradient-to-l from-white/30 to-transparent"></div>
+                  </div>
                 </div>
               </div>
             }
@@ -84,38 +96,57 @@
         </div>
 
         <!-- ================= GRÁFICO 3: RENDIMIENTO DE CITAS ================= -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <h3 class="text-lg font-bold text-gray-700 mb-4 flex items-center gap-2">
-            <span>🎯</span> Tasa de Éxito de Citas
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8 relative overflow-hidden">
+          <div class="absolute -bottom-24 -left-24 w-48 h-48 bg-emerald-50 rounded-full blur-3xl pointer-events-none"></div>
+
+          <h3 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2 relative z-10">
+            <span class="p-2 bg-emerald-50 text-emerald-600 rounded-lg">🎯</span> Tasa de Éxito de Citas
           </h3>
           
-          <div class="flex items-center gap-4">
+          <div class="flex items-center gap-8 relative z-10">
             
-            <!-- Dona simplificada con Tailwind -->
-            <div class="relative w-24 h-24 flex items-center justify-center bg-gray-100 rounded-full shadow-inner overflow-hidden border-[6px] border-white ring-2 ring-gray-100">
-               <div class="text-center z-10">
-                 <span class="text-2xl font-bold text-gray-800">{{ calcularPorcentajeCitas(resumenCitas()['Realizadas']) }}%</span>
+            <!-- Gráfico de Dona (SVG Real y Animado) -->
+            <div class="relative w-32 h-32 flex-shrink-0">
+               <!-- Fondo del círculo -->
+               <svg class="w-full h-full transform -rotate-90 drop-shadow-md" viewBox="0 0 120 120">
+                 <circle cx="60" cy="60" r="50" stroke="currentColor" stroke-width="12" fill="transparent" class="text-slate-100" />
+                 
+                 <!-- Progreso del círculo (Color Verde) -->
+                 <circle cx="60" cy="60" r="50" stroke="currentColor" stroke-width="12" fill="transparent"
+                         class="text-emerald-500 transition-all duration-1000 ease-out stroke-current"
+                         stroke-dasharray="314.159" 
+                         [style.stroke-dashoffset]="calcularDashOffset(resumenCitas()['Realizadas'])" 
+                         stroke-linecap="round" />
+               </svg>
+               
+               <!-- Porcentaje al centro -->
+               <div class="absolute inset-0 flex flex-col items-center justify-center">
+                 <span class="text-2xl font-black text-slate-800 tracking-tighter">{{ calcularPorcentajeCitas(resumenCitas()['Realizadas']) }}%</span>
+                 <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Éxito</span>
                </div>
-               <!-- Falso progreso (Puramente visual para decorar, ya que CSS no puede hacer arcos complejos fácil, mostramos la métrica al medio) -->
-               <div class="absolute inset-0 bg-green-200 opacity-20"></div>
-               <div class="absolute bottom-0 w-full bg-green-500 opacity-20 transition-all duration-700" [style.height.%]="calcularPorcentajeCitas(resumenCitas()['Realizadas'])"></div>
             </div>
 
             <!-- Leyenda de datos duros -->
-            <div class="flex-1 space-y-2">
-              <div class="flex justify-between items-center bg-green-50 px-3 py-2 rounded">
-                <span class="text-xs font-bold text-green-700 flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-green-500"></div> Realizadas</span>
-                <span class="text-sm font-bold text-green-800">{{ resumenCitas()['Realizadas'] }}</span>
+            <div class="flex-1 space-y-3">
+              <div class="flex justify-between items-center bg-white border border-slate-100 shadow-sm px-4 py-2.5 rounded-xl hover:shadow-md transition-shadow">
+                <span class="text-sm font-semibold text-slate-600 flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]"></span> Realizadas
+                </span>
+                <span class="text-base font-black text-slate-800">{{ resumenCitas()['Realizadas'] }}</span>
               </div>
               
-              <div class="flex justify-between items-center bg-yellow-50 px-3 py-2 rounded">
-                <span class="text-xs font-bold text-yellow-700 flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-yellow-500"></div> Pendientes</span>
-                <span class="text-sm font-bold text-yellow-800">{{ resumenCitas()['Pendientes'] }}</span>
+              <div class="flex justify-between items-center bg-white border border-slate-100 shadow-sm px-4 py-2.5 rounded-xl hover:shadow-md transition-shadow">
+                <span class="text-sm font-semibold text-slate-600 flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.6)]"></span> Pendientes
+                </span>
+                <span class="text-base font-black text-slate-800">{{ resumenCitas()['Pendientes'] }}</span>
               </div>
 
-              <div class="flex justify-between items-center bg-red-50 px-3 py-2 rounded">
-                <span class="text-xs font-bold text-red-700 flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-red-500"></div> Canceladas</span>
-                <span class="text-sm font-bold text-red-800">{{ resumenCitas()['Canceladas'] }}</span>
+              <div class="flex justify-between items-center bg-white border border-slate-100 shadow-sm px-4 py-2.5 rounded-xl hover:shadow-md transition-shadow">
+                <span class="text-sm font-semibold text-slate-600 flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.6)]"></span> Canceladas
+                </span>
+                <span class="text-base font-black text-slate-800">{{ resumenCitas()['Canceladas'] }}</span>
               </div>
             </div>
 

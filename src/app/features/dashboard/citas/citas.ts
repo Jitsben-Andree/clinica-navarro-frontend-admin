@@ -3,8 +3,10 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CitaService } from '../../../core/services/cita';
 import { PacienteService } from '../../../core/services/paciente';
+import { EmpleadoService } from '../../../core/services/empleado';
 import { Cita } from '../../../shared/interfaces/cita.dto';
 import { Paciente } from '../../../shared/interfaces/paciente.dto';
+import { EmpleadoResponse } from '../../../shared/interfaces/empleado.dto';
 
 @Component({
   selector: 'app-citas',
@@ -15,19 +17,15 @@ import { Paciente } from '../../../shared/interfaces/paciente.dto';
 export class CitasComponent implements OnInit {
   private citaService = inject(CitaService);
   private pacienteService = inject(PacienteService);
+  private empleadoService = inject(EmpleadoService);
   private fb = inject(FormBuilder);
 
   // Signals para el estado
   citas = signal<Cita[]>([]);
   pacientes = signal<Paciente[]>([]);
+  odontologos = signal<EmpleadoResponse[]>([]); // Doctores 100% reales desde la BD
   cargando = signal<boolean>(false);
   mostrarModal = signal<boolean>(false);
-
-  // Doctores simulados (Hasta que hagamos el módulo de Usuarios/Empleados)
-  odontologos = [
-    { id: 1, nombre: 'Dr. Roberto Navarro (Ortodoncia)' },
-    { id: 2, nombre: 'Dra. María Fernández (Odontopediatría)' }
-  ];
 
   // Formulario Reactivo
   citaForm = this.fb.nonNullable.group({
@@ -40,6 +38,7 @@ export class CitasComponent implements OnInit {
   ngOnInit(): void {
     this.cargarCitas();
     this.cargarPacientes();
+    this.cargarOdontologos();
   }
 
   cargarCitas(): void {
@@ -60,7 +59,14 @@ export class CitasComponent implements OnInit {
 
   cargarPacientes(): void {
     this.pacienteService.listarTodos().subscribe({
-      next: (data) => this.pacientes.set(data.filter(p => p.estadoActivo)) // Solo pacientes activos
+      next: (data) => this.pacientes.set(data.filter(p => p.estadoActivo)) // Solo mostramos pacientes activos
+    });
+  }
+
+  cargarOdontologos(): void {
+    // Solo trae a los usuarios que tengan el rol 'ROLE_ODONTOLOGO' y estén activos
+    this.empleadoService.listarOdontologos().subscribe({
+      next: (data) => this.odontologos.set(data)
     });
   }
 
@@ -99,7 +105,6 @@ export class CitasComponent implements OnInit {
     }
   }
 
-  // Utilidad para pintar las etiquetas de colores según el estado
   getColorEstado(estado?: string): string {
     switch (estado) {
       case 'PENDIENTE': return 'bg-yellow-100 text-yellow-800 border-yellow-200';

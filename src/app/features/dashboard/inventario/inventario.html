@@ -1,1 +1,159 @@
-<p>inventario works!</p>
+<div class="animate-fade-in-up space-y-6">
+  
+  <!-- Cabecera -->
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div>
+      <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+        <span>📦</span> Control de Inventario
+      </h2>
+      <p class="text-gray-500 text-sm mt-1">Gestiona los materiales e insumos odontológicos de la clínica.</p>
+    </div>
+    
+    <div class="flex items-center gap-4 w-full sm:w-auto">
+      @if (alertasStock() > 0) {
+        <div class="bg-red-50 text-red-700 px-4 py-2 rounded-lg border border-red-200 font-bold text-sm flex items-center gap-2 shadow-sm animate-pulse">
+          <span>⚠️</span> {{ alertasStock() }} Alertas de Stock
+        </div>
+      }
+      <button (click)="abrirModal()" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-bold shadow flex items-center justify-center gap-2 transition-colors">
+        <span>➕</span> Nuevo Insumo
+      </button>
+    </div>
+  </div>
+
+  <!-- Tabla de Inventario -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-gray-50 border-b border-gray-200 text-gray-600 text-xs uppercase tracking-wider">
+            <th class="px-6 py-4 font-bold">Insumo / Material</th>
+            <th class="px-6 py-4 font-bold">Estado</th>
+            <th class="px-6 py-4 font-bold text-center">Stock Actual</th>
+            <th class="px-6 py-4 font-bold text-center">Mínimo Ideal</th>
+            <th class="px-6 py-4 font-bold text-center">Caducidad</th>
+            <th class="px-6 py-4 font-bold text-center">Ajustar Stock</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          
+          @if (cargando()) {
+            <tr><td colspan="6" class="p-12 text-center text-gray-500">
+              <div class="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+              Cargando inventario...
+            </td></tr>
+          } @else if (insumos().length === 0) {
+            <tr><td colspan="6" class="p-12 text-center text-gray-500 italic">El inventario está vacío. Registra el primer insumo.</td></tr>
+          } @else {
+            @for (item of insumos(); track item.id) {
+              <tr class="hover:bg-blue-50 transition-colors group">
+                <td class="px-6 py-4">
+                  <div class="font-bold text-gray-800">{{ item.nombre }}</div>
+                  <div class="text-xs text-gray-500">{{ item.unidadMedida }}</div>
+                </td>
+                <td class="px-6 py-4">
+                  <span class="px-3 py-1 rounded-full text-[10px] font-bold border uppercase tracking-wider" [ngClass]="getColorEstado(item.estadoStock)">
+                    {{ item.estadoStock }}
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-center">
+                  <span class="text-lg font-black" [ngClass]="{'text-red-600': item.estadoStock === 'AGOTADO', 'text-yellow-600': item.estadoStock === 'BAJO', 'text-gray-800': item.estadoStock === 'NORMAL'}">
+                    {{ item.stockActual }}
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-center text-sm font-medium text-gray-500">
+                  {{ item.stockMinimo }}
+                </td>
+                <td class="px-6 py-4 text-center text-sm">
+                  @if (item.fechaCaducidad) {
+                    <span class="text-gray-600">{{ item.fechaCaducidad | date:'dd/MM/yyyy' }}</span>
+                  } @else {
+                    <span class="text-gray-400 italic">N/A</span>
+                  }
+                </td>
+                <td class="px-6 py-4 text-center">
+                  <div class="flex items-center justify-center gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                    <!-- Botón Restar -->
+                    <button (click)="modificarStock(item, -1)" [disabled]="item.stockActual === 0" class="w-8 h-8 rounded-full bg-red-100 text-red-600 hover:bg-red-200 hover:text-red-800 font-bold flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed" title="Restar 1">
+                      -
+                    </button>
+                    <!-- Botón Sumar -->
+                    <button (click)="modificarStock(item, 1)" class="w-8 h-8 rounded-full bg-green-100 text-green-600 hover:bg-green-200 hover:text-green-800 font-bold flex items-center justify-center transition-colors" title="Añadir 1">
+                      +
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ================= MODAL DE REGISTRO ================= -->
+@if (mostrarModal()) {
+  <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col animate-fade-in-up">
+      
+      <!-- Header Modal -->
+      <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+        <h3 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+          <span>📦</span> Registrar Nuevo Insumo
+        </h3>
+        <button (click)="cerrarModal()" class="text-gray-400 hover:text-red-500 font-bold text-2xl leading-none transition-colors">&times;</button>
+      </div>
+
+      <!-- Body Modal -->
+      <div class="p-6 relative">
+        <form [formGroup]="inventarioForm" id="formInsumo" (ngSubmit)="guardarInsumo()" class="space-y-4">
+          
+          <div>
+            <label class="block text-sm font-bold text-gray-700 mb-1">Nombre del Material *</label>
+            <input type="text" formControlName="nombre" class="w-full border-2 border-blue-100 rounded-lg px-4 py-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" placeholder="Ej: Resina compuesta, Guantes M...">
+          </div>
+          
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-bold text-gray-700 mb-1">Stock Inicial *</label>
+              <input type="number" formControlName="stockActual" class="w-full border-2 border-blue-100 rounded-lg px-4 py-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+            </div>
+            <div>
+              <label class="block text-sm font-bold text-gray-700 mb-1">Umbral de Alerta (Min) *</label>
+              <input type="number" formControlName="stockMinimo" class="w-full border-2 border-blue-100 rounded-lg px-4 py-2 focus:ring-blue-500 focus:border-blue-500 transition-colors" title="Te avisaremos si el stock cae por debajo de este número">
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-bold text-gray-700 mb-1">Unidad de Medida *</label>
+              <select formControlName="unidadMedida" class="w-full border-2 border-blue-100 rounded-lg px-4 py-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                <option value="Unidades">Unidades</option>
+                <option value="Cajas">Cajas</option>
+                <option value="Paquetes">Paquetes</option>
+                <option value="Jeringas">Jeringas</option>
+                <option value="Galones">Galones</option>
+                <option value="Kilos">Kilos</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-bold text-gray-700 mb-1">Fecha de Caducidad</label>
+              <input type="date" formControlName="fechaCaducidad" class="w-full border-2 border-blue-100 rounded-lg px-4 py-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm">
+            </div>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- Footer Modal -->
+      <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
+        <button (click)="cerrarModal()" type="button" class="px-5 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 font-bold hover:bg-gray-100 transition-colors">Cancelar</button>
+        <button form="formInsumo" type="submit" [disabled]="inventarioForm.invalid" class="px-6 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 shadow-md shadow-blue-200 disabled:bg-blue-300 transition-all">
+          Guardar Insumo
+        </button>
+      </div>
+
+    </div>
+  </div>
+}

@@ -17,11 +17,16 @@ export class AuthComponent {
 
   cargando = signal<boolean>(false);
   mensajeError = signal<string | null>(null);
+  mostrarPassword = signal<boolean>(false);
 
   loginForm = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(6)]]
   });
+
+  togglePassword() {
+    this.mostrarPassword.update(val => !val);
+  }
 
   onSubmit(): void {
     if (this.loginForm.invalid) {
@@ -39,10 +44,9 @@ export class AuthComponent {
       },
       error: (err) => {
         this.cargando.set(false);
-        this.mensajeError.set(err.error?.message || 'Error de autenticación. Verifique sus credenciales.');
+        this.mensajeError.set(err.error?.message || 'Error de autenticación. Verifica tus credenciales.');
         
-        // Limpiar error después de 3 segundos
-        setTimeout(() => this.mensajeError.set(null), 3000);
+        setTimeout(() => this.mensajeError.set(null), 4000);
       }
     });
   }

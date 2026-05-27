@@ -49,7 +49,7 @@ export class ResumenComponent implements OnInit {
     };
 
     this.analiticaService.obtenerIngresosMensuales().subscribe(res => {
-      this.ingresos.set(res);
+      this.ingresos.set(res.reverse()); // Aseguramos orden cronológico (Izq a Der)
       checkCarga();
     });
 
@@ -76,5 +76,12 @@ export class ResumenComponent implements OnInit {
   calcularPorcentajeCitas(cantidad: number): number {
     if (this.totalCitas() === 0) return 0;
     return Math.round((cantidad / this.totalCitas()) * 100);
+  }
+
+  // Nueva función para el Gráfico SVG de Dona
+  calcularDashOffset(cantidad: number): number {
+    const porcentaje = this.calcularPorcentajeCitas(cantidad);
+    const circumference = 314.159; // 2 * Math.PI * r (donde r=50)
+    return circumference - (porcentaje / 100) * circumference;
   }
 }

@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../core/services/auth';
 import { CommonModule } from '@angular/common';
@@ -10,11 +10,13 @@ import { CommonModule } from '@angular/common';
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.css']
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
 
-  emailUsuario = this.authService.obtenerToken() ? 'Administrador' : 'Usuario';
+  emailUsuario = 'Cargando...';
+  rolUsuario = ''; 
+  
   fechaActual = new Date().toLocaleDateString('es-PE', { 
     weekday: 'long', 
     year: 'numeric', 
@@ -22,12 +24,30 @@ export class DashboardComponent {
     day: 'numeric' 
   });
 
-  rolUsuario = localStorage.getItem('user_role') || ''; 
+  ngOnInit(): void {
+    
+    if (typeof window !== 'undefined') {
+      this.emailUsuario = localStorage.getItem('user_email') || 'Usuario Administrativo';
+      this.rolUsuario = localStorage.getItem('user_role') || ''; 
+    }
+  }
   
   cerrarSesion(): void {
-    if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
-      this.authService.cerrarSesion();
-      this.router.navigate(['/login']);
+    if (typeof window !== 'undefined') {
+      if (window.confirm('¿Estás seguro de que deseas cerrar sesión en el sistema?')) {
+        this.authService.cerrarSesion();
+        this.router.navigate(['/login']);
+      }
+    }
+  }
+
+  
+  getNombreRol(): string {
+    switch (this.rolUsuario) {
+      case 'ROLE_ADMIN': return 'Administrador General';
+      case 'ROLE_RECEPCIONISTA': return 'Recepción y Caja';
+      case 'ROLE_ODONTOLOGO': return 'Especialista Médico';
+      default: return 'Personal Clínico';
     }
   }
 }
