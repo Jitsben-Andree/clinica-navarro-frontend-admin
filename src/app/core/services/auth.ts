@@ -1,41 +1,63 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
-import { LoginRequest, AuthResponse } from '../../shared/interfaces/auth.dto';
+
+export interface LoginRequest {
+  email?: string | null;
+  password?: string | null;
+}
+
+export interface AuthResponse {
+  token: string;
+  email: string;
+  rol: string;
+  usuarioId: number;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly http = inject(HttpClient);
-  
-  // URL directa, respetando tu decisión de no usar environments
-  private readonly apiUrl = 'http://217.216.94.194:8080/api/auth';
+  private readonly apiUrl = 'http://217.216.94.194:8080/api/auth'; // RECUERDA CAMBIAR ESTO POR LA IP DE TU VPS
   private readonly TOKEN_KEY = 'jwt_token';
+
+  constructor(private http: HttpClient) {}
 
   login(credentials: LoginRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials).pipe(
       tap((response) => {
-        this.guardarToken(response.token);
-        localStorage.setItem('user_role', response.rol);
+        if (typeof window !== 'undefined') {
+          this.guardarToken(response.token);
+          localStorage.setItem('user_role', response.rol);
+        }
       })
     );
   }
 
   guardarToken(token: string): void {
-    localStorage.setItem(this.TOKEN_KEY, token);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(this.TOKEN_KEY, token);
+    }
   }
 
   obtenerToken(): string | null {
-    return localStorage.getItem(this.TOKEN_KEY);
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem(this.TOKEN_KEY);
+    }
+    return null;
   }
 
   estaLogueado(): boolean {
-    return this.obtenerToken() !== null;
+    if (typeof window !== 'undefined') {
+      return this.obtenerToken() !== null;
+    }
+    return false;
   }
 
   cerrarSesion(): void {
-    localStorage.removeItem(this.TOKEN_KEY);
-    localStorage.removeItem('user_role');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(this.TOKEN_KEY);
+      localStorage.removeItem('user_role');
+    }
   }
 }
