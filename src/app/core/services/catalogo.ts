@@ -8,7 +8,7 @@ import { CatalogoServicio } from '../../shared/interfaces/catalogo.dto';
 })
 export class CatalogoService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:8080/api/catalogo';
+  private readonly apiUrl = 'http://217.216.94.194:8080/api/catalogo';
 
   listarTodos(): Observable<CatalogoServicio[]> {
     return this.http.get<CatalogoServicio[]>(this.apiUrl);

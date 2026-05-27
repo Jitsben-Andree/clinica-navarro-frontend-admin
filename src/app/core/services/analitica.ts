@@ -8,7 +8,7 @@ import { IngresoMensualDTO, TratamientoEstadisticaDTO } from '../../shared/inter
 })
 export class AnaliticaService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:8080/api/analitica';
+  private readonly apiUrl = 'http://217.216.94.194:8080/api/analitica';
 
   obtenerIngresosMensuales(): Observable<IngresoMensualDTO[]> {
     return this.http.get<IngresoMensualDTO[]>(`${this.apiUrl}/ingresos-mensuales`);

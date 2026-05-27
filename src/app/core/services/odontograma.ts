@@ -8,7 +8,7 @@ import { OdontogramaResponse, DetalleOdontogramaDTO } from '../../shared/interfa
 })
 export class OdontogramaService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:8080/api/odontogramas';
+  private readonly apiUrl = 'http://217.216.94.194:8080/api/odontogramas';
 
   obtenerPorFicha(fichaId: number): Observable<OdontogramaResponse> {
     return this.http.get<OdontogramaResponse>(`${this.apiUrl}/ficha/${fichaId}`);

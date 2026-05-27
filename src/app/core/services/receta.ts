@@ -8,7 +8,7 @@ import { Receta } from '../../shared/interfaces/receta.dto';
 })
 export class RecetaService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:8080/api/recetas';
+  private readonly apiUrl = 'http://217.216.94.194:8080/api/recetas';
 
   obtenerPorCita(citaId: number): Observable<Receta> {
     return this.http.get<Receta>(`${this.apiUrl}/cita/${citaId}`);

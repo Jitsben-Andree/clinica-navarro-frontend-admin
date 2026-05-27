@@ -8,7 +8,7 @@ import { Paciente } from '../../shared/interfaces/paciente.dto';
 })
 export class PacienteService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:8080/api/pacientes';
+  private readonly apiUrl = 'http://217.216.94.194:8080/api/pacientes';
 
   listarTodos(): Observable<Paciente[]> {
     return this.http.get<Paciente[]>(this.apiUrl);

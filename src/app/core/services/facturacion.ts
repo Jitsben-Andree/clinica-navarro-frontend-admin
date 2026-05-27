@@ -13,7 +13,7 @@ import {
 })
 export class FacturacionService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:8080/api/facturacion';
+  private readonly apiUrl = 'http://217.216.94.194:8080/api/facturacion';
 
   // --- TRATAMIENTOS ---
   listarTratamientos(citaId: number): Observable<TratamientoResponse[]> {

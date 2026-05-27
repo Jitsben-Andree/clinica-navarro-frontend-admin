@@ -8,7 +8,7 @@ import { EmpleadoRequest, EmpleadoResponse } from '../../shared/interfaces/emple
 })
 export class EmpleadoService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:8080/api/empleados';
+  private readonly apiUrl = 'http://217.216.94.194:8080/api/empleados';
 
   listarTodos(): Observable<EmpleadoResponse[]> {
     return this.http.get<EmpleadoResponse[]>(this.apiUrl);

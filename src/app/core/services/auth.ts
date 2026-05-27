@@ -10,7 +10,7 @@ export class AuthService {
   private readonly http = inject(HttpClient);
   
   // URL directa, respetando tu decisión de no usar environments
-  private readonly apiUrl = 'http://localhost:8080/api/auth';
+  private readonly apiUrl = 'http://217.216.94.194:8080/api/auth';
   private readonly TOKEN_KEY = 'jwt_token';
 
   login(credentials: LoginRequest): Observable<AuthResponse> {

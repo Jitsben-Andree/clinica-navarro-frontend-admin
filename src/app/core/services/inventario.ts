@@ -8,7 +8,7 @@ import { InsumoRequest, InsumoResponse } from '../../shared/interfaces/inventari
 })
 export class InventarioService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:8080/api/inventario';
+  private readonly apiUrl = 'http://217.216.94.194:8080/api/inventario';
 
   listarTodos(): Observable<InsumoResponse[]> {
     return this.http.get<InsumoResponse[]>(this.apiUrl);

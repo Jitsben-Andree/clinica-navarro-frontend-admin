@@ -8,7 +8,7 @@ import { FichaClinica } from '../../shared/interfaces/clinico.dto';
 })
 export class ClinicoService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:8080/api/fichas';
+  private readonly apiUrl = 'http://217.216.94.194:8080/api/fichas';
 
   obtenerFicha(pacienteId: number): Observable<FichaClinica> {
     return this.http.get<FichaClinica>(`${this.apiUrl}/paciente/${pacienteId}`);
