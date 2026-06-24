@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, Validators, FormArray, FormGroup } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators, FormArray } from '@angular/forms';
 import { ClinicoService } from '../../../core/services/clinico';
 import { PacienteService } from '../../../core/services/paciente';
 import { FichaClinica, AntecedenteDTO } from '../../../shared/interfaces/clinico.dto';
@@ -26,72 +26,75 @@ export class ClinicoComponent implements OnInit {
   private odontogramaService = inject(OdontogramaService);
   private citaService = inject(CitaService);
   private recetaService = inject(RecetaService);
-  private toastService = inject(ToastService); // Magia UX
+  private toastService = inject(ToastService);
 
   // Control de Pestañas
   tabActiva = signal<'historial' | 'odontograma' | 'recetas'>('historial');
 
-  // Signals de la Sala de Espera (Nueva Épica)
+  // Signals Sala de Espera
   pacientesEnSala = signal<Cita[]>([]);
   cargandoSala = signal<boolean>(true);
 
-  // Signals Historial Médico
+  // Signals Historial
   pacientes = signal<Paciente[]>([]);
   pacienteSeleccionado = signal<number | null>(null);
   cargando = signal<boolean>(false);
   fichaActual = signal<FichaClinica | null>(null);
-  mensajeExito = signal<boolean>(false);
 
   // Signals Odontograma
   dientes = signal<DetalleOdontogramaDTO[]>(this.generarDientesVacios());
   cargandoOdontograma = signal<boolean>(false);
   mostrarModalDiente = signal<boolean>(false);
   dienteSeleccionado = signal<DetalleOdontogramaDTO | null>(null);
-  mensajeExitoOdonto = signal<boolean>(false);
 
   // Signals Recetas
   citasPaciente = signal<Cita[]>([]);
   citaSeleccionadaParaReceta = signal<number | null>(null);
   recetaActual = signal<Receta | null>(null);
   cargandoReceta = signal<boolean>(false);
-  mensajeExitoReceta = signal<boolean>(false);
 
-  // Formulario Receta
+  // MAGIA UX: Plantillas de recetas para ahorrar tiempo escribiendo
+  plantillasReceta = [
+    { 
+      nombre: 'Post-Extracción Simple', 
+      icono: '🦷',
+      texto: '1. Amoxicilina 500mg: Tomar 1 cápsula cada 8 horas por 7 días.\n2. Ibuprofeno 400mg: Tomar 1 tableta cada 8 horas por 3 días para el dolor.\n3. Reposo absoluto. Dieta blanda y fría. No escupir ni realizar enjuagues bruscos.' 
+    },
+    { 
+      nombre: 'Infección / Absceso', 
+      icono: '🦠',
+      texto: '1. Clindamicina 300mg: Tomar 1 cápsula cada 8 horas por 7 días.\n2. Ketorolaco 10mg: Tomar 1 tableta cada 8 horas por 3 días (solo si hay dolor fuerte).' 
+    },
+    { 
+      nombre: 'Limpieza / Profilaxis', 
+      icono: '✨',
+      texto: '1. Usar enjuague bucal con Clorhexidina al 0.12% dos veces al día por 7 días.\n2. Uso de hilo dental diario y cepillado de cerdas suaves.\n3. Próximo control de rutina en 6 meses.' 
+    }
+  ];
+
   recetaForm = this.fb.group({
     indicaciones: ['', Validators.required]
   });
 
-  // Formulario con FormArray para los antecedentes dinámicos
   fichaForm = this.fb.group({
     tipoSangre: [''],
     antecedentes: this.fb.array([])
   });
 
   ngOnInit(): void {
-    // 1. Cargar el buscador global por si busca un historial pasado
     this.pacienteService.listarTodos().subscribe(data => this.pacientes.set(data));
-    
-    // 2. Cargar la "Sala de Espera Virtual" para hoy
     this.cargarSalaDeEspera();
   }
-
-  // ================= LÓGICA DE SALA DE ESPERA (UX) =================
 
   cargarSalaDeEspera(): void {
     this.cargandoSala.set(true);
     this.citaService.listarTodas().subscribe({
       next: (citas: Cita[]) => {
-        // Obtenemos la fecha de hoy sin problemas de zona horaria
         const hoy = new Date();
         hoy.setMinutes(hoy.getMinutes() - hoy.getTimezoneOffset());
         const hoyStr = hoy.toISOString().split('T')[0];
 
-        // Filtramos: Solo citas de HOY que la recepcionista marcó como "CONFIRMADA" (Check-in)
-        const enSala = citas.filter(c => 
-          c.fechaHora.startsWith(hoyStr) && c.estado === 'CONFIRMADA'
-        );
-        
-        // Ordenamos por hora de atención
+        const enSala = citas.filter(c => c.fechaHora.startsWith(hoyStr) && c.estado === 'CONFIRMADA');
         enSala.sort((a, b) => new Date(a.fechaHora).getTime() - new Date(b.fechaHora).getTime());
         
         this.pacientesEnSala.set(enSala);
@@ -103,12 +106,10 @@ export class ClinicoComponent implements OnInit {
 
   atenderPaciente(cita: Cita): void {
     this.pacienteSeleccionado.set(cita.pacienteId);
-    this.tabActiva.set('historial'); // Llevamos al doctor a la pestaña principal
+    this.tabActiva.set('historial');
     this.cargarFicha(cita.pacienteId);
-    this.toastService.mostrar('info', `Abriendo expediente médico de ${cita.pacienteNombreCompleto}`);
+    this.toastService.mostrar('info', `Expediente de ${cita.pacienteNombreCompleto} abierto.`);
   }
-
-  // ================= LÓGICA DE HISTORIAL =================
 
   get antecedentesFormArray() {
     return this.fichaForm.get('antecedentes') as FormArray;
@@ -126,11 +127,9 @@ export class ClinicoComponent implements OnInit {
     this.antecedentesFormArray.removeAt(index);
   }
 
-  // Buscador manual (combobox)
   onPacienteChange(event: Event): void {
     const selectElement = event.target as HTMLSelectElement;
     const pId = Number(selectElement.value);
-    
     if (pId) {
       this.pacienteSeleccionado.set(pId);
       this.cargarFicha(pId);
@@ -139,38 +138,31 @@ export class ClinicoComponent implements OnInit {
 
   volverASalaEspera(): void {
     this.pacienteSeleccionado.set(null);
-    this.cargarSalaDeEspera(); // Refrescamos por si alguien nuevo llegó
+    this.cargarSalaDeEspera();
   }
 
   cargarFicha(pacienteId: number): void {
     this.cargando.set(true);
-    this.mensajeExito.set(false);
-    
     this.clinicoService.obtenerFicha(pacienteId).subscribe({
       next: (ficha) => {
         this.fichaActual.set(ficha);
-        
         this.fichaForm.patchValue({ tipoSangre: ficha.tipoSangre || '' });
         
         this.antecedentesFormArray.clear();
         if (ficha.antecedentes) {
           ficha.antecedentes.forEach(a => this.agregarAntecedente(a.categoria, a.descripcion));
         }
-        
         this.cargando.set(false);
       },
       error: () => {
-        this.toastService.mostrar('error', 'Error al cargar el historial del paciente');
+        this.toastService.mostrar('error', 'Error al cargar historial.');
         this.cargando.set(false);
       }
     });
   }
 
   guardarFicha(): void {
-    if (this.fichaForm.invalid || !this.pacienteSeleccionado()) {
-      this.fichaForm.markAllAsTouched();
-      return;
-    }
+    if (this.fichaForm.invalid || !this.pacienteSeleccionado()) return;
 
     const formValue = this.fichaForm.value;
     const request: FichaClinica = {
@@ -183,18 +175,15 @@ export class ClinicoComponent implements OnInit {
     this.clinicoService.guardarFicha(request).subscribe({
       next: (fichaGuardada) => {
         this.cargando.set(false);
-        this.toastService.mostrar('exito', 'Historial médico guardado con éxito');
+        this.toastService.mostrar('exito', 'Historial médico actualizado.');
         this.fichaActual.set(fichaGuardada);
-        this.cargarFicha(this.pacienteSeleccionado()!); 
       },
       error: () => {
-        this.toastService.mostrar('error', 'Ocurrió un problema al guardar la ficha');
+        this.toastService.mostrar('error', 'No se pudo guardar la ficha.');
         this.cargando.set(false);
       }
     });
   }
-
-  // ================= LÓGICA DEL ODONTOGRAMA =================
 
   cambiarTab(tab: 'historial' | 'odontograma' | 'recetas'): void {
     this.tabActiva.set(tab);
@@ -233,7 +222,7 @@ export class ClinicoComponent implements OnInit {
         this.cargandoOdontograma.set(false);
       },
       error: () => {
-        this.toastService.mostrar('error', 'No se pudo cargar el odontograma');
+        this.toastService.mostrar('error', 'Error al sincronizar odontograma.');
         this.cargandoOdontograma.set(false);
       }
     });
@@ -267,44 +256,44 @@ export class ClinicoComponent implements OnInit {
   guardarOdontograma(): void {
     const ficha = this.fichaActual();
     if (!ficha || !ficha.id) {
-        this.toastService.mostrar('info', 'Debe guardar primero los datos básicos del Historial Médico para crear la Ficha en la BD.');
+        this.toastService.mostrar('info', 'Guarda el historial médico primero.');
         return;
     }
 
     this.cargandoOdontograma.set(true);
-    
-    const dientesAfectados = this.dientes().filter(d => 
-      d.estadoDiagnostico !== 'Sano' || (d.observaciones && d.observaciones.trim() !== '')
-    );
+    const dientesAfectados = this.dientes().filter(d => d.estadoDiagnostico !== 'Sano' || (d.observaciones && d.observaciones.trim() !== ''));
 
     this.odontogramaService.guardarOdontograma(ficha.id, dientesAfectados).subscribe({
       next: () => {
         this.cargandoOdontograma.set(false);
-        this.toastService.mostrar('exito', 'Odontograma guardado y actualizado con éxito');
+        this.toastService.mostrar('exito', 'Odontograma dental guardado.');
       },
       error: () => {
-        this.toastService.mostrar('error', 'Ocurrió un error guardando las piezas dentales');
+        this.toastService.mostrar('error', 'Error al guardar piezas.');
         this.cargandoOdontograma.set(false);
       }
     });
   }
 
+  // Estilos base para el diente según el diagnóstico
   getColorDiente(estado: string): string {
+    const base = "w-10 h-14 border border-white/20 shadow-md transition-all duration-300 transform group-hover:scale-110 flex items-center justify-center relative overflow-hidden";
+    
     switch(estado) {
-      case 'Caries': return 'bg-red-500 text-white border-red-700 shadow-red-200';
-      case 'Curación': return 'bg-blue-500 text-white border-blue-700 shadow-blue-200';
-      case 'Ausente': return 'bg-gray-800 text-gray-300 border-gray-900 opacity-80';
-      case 'Extracción Indicada': return 'bg-orange-500 text-white border-orange-700 shadow-orange-200';
-      case 'Endodoncia': return 'bg-purple-500 text-white border-purple-700 shadow-purple-200';
-      default: return 'bg-white text-gray-800 border-gray-300 hover:bg-blue-50 shadow-sm';
+      case 'Caries': return `${base} bg-gradient-to-br from-rose-500 to-red-600 border-red-500 shadow-red-500/30 text-white`;
+      case 'Curación': return `${base} bg-gradient-to-br from-blue-400 to-blue-600 border-blue-500 shadow-blue-500/30 text-white`;
+      case 'Ausente': return `${base} bg-slate-200 border-slate-300 text-slate-400 opacity-60`;
+      case 'Extracción Indicada': return `${base} bg-gradient-to-br from-orange-400 to-orange-500 border-orange-500 shadow-orange-500/30 text-white`;
+      case 'Endodoncia': return `${base} bg-gradient-to-br from-purple-500 to-purple-600 border-purple-500 shadow-purple-500/30 text-white`;
+      default: return `${base} bg-white border-slate-200 text-slate-300 shadow-sm`;
     }
   }
 
-  // ================= LÓGICA DE RECETAS =================
-
   cargarCitasParaReceta(pacienteId: number): void {
     this.citaService.listarPorPaciente(pacienteId).subscribe((data: Cita[]) => {
-      this.citasPaciente.set(data);
+      // Ordenamos las citas para mostrar la más reciente primero
+      const ordenadas = data.sort((a,b) => new Date(b.fechaHora).getTime() - new Date(a.fechaHora).getTime());
+      this.citasPaciente.set(ordenadas);
       this.citaSeleccionadaParaReceta.set(null);
       this.recetaForm.reset();
       this.recetaActual.set(null);
@@ -318,6 +307,14 @@ export class ClinicoComponent implements OnInit {
       this.citaSeleccionadaParaReceta.set(citaId);
       this.cargarReceta(citaId);
     }
+  }
+
+  // MAGIA UX: Añadir plantilla al textarea
+  usarPlantilla(textoPlantilla: string): void {
+    const actual = this.recetaForm.value.indicaciones || '';
+    const nuevoTexto = actual ? `${actual}\n\n${textoPlantilla}` : textoPlantilla;
+    this.recetaForm.patchValue({ indicaciones: nuevoTexto });
+    this.toastService.mostrar('info', 'Plantilla insertada. Puedes modificarla.');
   }
 
   cargarReceta(citaId: number): void {
@@ -345,10 +342,10 @@ export class ClinicoComponent implements OnInit {
       next: (res) => {
         this.recetaActual.set(res);
         this.cargandoReceta.set(false);
-        this.toastService.mostrar('exito', 'Receta médica guardada y lista para imprimir');
+        this.toastService.mostrar('exito', 'Receta guardada. Lista para exportar en PDF.');
       },
       error: () => {
-        this.toastService.mostrar('error', 'Error al guardar la receta');
+        this.toastService.mostrar('error', 'Error al guardar receta.');
         this.cargandoReceta.set(false);
       }
     });
@@ -358,6 +355,7 @@ export class ClinicoComponent implements OnInit {
     const citaId = this.citaSeleccionadaParaReceta();
     if (!citaId) return;
     
+    this.toastService.mostrar('info', 'Generando PDF...');
     this.recetaService.descargarPdf(citaId).subscribe(blob => {
       const url = window.URL.createObjectURL(blob);
       window.open(url, '_blank'); 

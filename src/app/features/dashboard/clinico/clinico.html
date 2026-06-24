@@ -1,22 +1,22 @@
-<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 min-h-[80vh] relative animate-fade-in-up">
+<div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-8 min-h-[85vh] relative animate-fade-in-up">
   
   <!-- ================= CABECERA PRINCIPAL ================= -->
-  <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 border-b border-slate-100 pb-6">
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-6 border-b border-slate-100 pb-6">
     <div>
-      <h2 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
-        <span class="p-2 bg-blue-50 text-blue-600 rounded-lg">👨‍⚕️</span> Módulo Clínico
+      <h2 class="text-2xl font-black text-slate-800 flex items-center gap-3">
+        <span class="p-2.5 bg-blue-50 text-blue-600 rounded-xl shadow-inner">👨‍⚕️</span> Módulo Clínico
       </h2>
-      <p class="text-slate-500 text-sm mt-1">Sala de espera, historial médico y diagnóstico odontológico.</p>
+      <p class="text-slate-500 text-sm mt-2 font-medium">Gestión integral del paciente: Historial, Odontograma y Recetas.</p>
     </div>
     
-    <!-- Buscador Global / Histórico (Para buscar pacientes que no tienen cita hoy) -->
+    <!-- Buscador Histórico -->
     <div class="w-full md:w-96 relative group">
-      <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Buscador Histórico:</label>
-      <div class="absolute inset-y-0 left-0 top-5 pl-3 flex items-center pointer-events-none">
+      <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Búsqueda Manual:</label>
+      <div class="absolute inset-y-0 left-0 top-6 pl-4 flex items-center pointer-events-none">
         <span class="text-slate-400">🔍</span>
       </div>
-      <select (change)="onPacienteChange($event)" class="w-full border-2 border-slate-200 rounded-xl pl-10 pr-4 py-2.5 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-semibold text-slate-700 cursor-pointer transition-all appearance-none">
-        <option value="" disabled selected>-- Buscar cualquier paciente en la BD --</option>
+      <select (change)="onPacienteChange($event)" class="w-full border border-slate-200 rounded-xl pl-11 pr-4 py-3 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-semibold text-slate-700 cursor-pointer transition-all appearance-none shadow-sm">
+        <option value="" disabled selected>-- Buscar historial de paciente... --</option>
         @for (p of pacientes(); track p.id) {
           <option [value]="p.id">{{ p.nombres }} {{ p.apellidos }} (DNI: {{ p.dni }})</option>
         }
@@ -24,59 +24,61 @@
     </div>
   </div>
 
-  <!-- ================= SALA DE ESPERA VIRTUAL (NUEVO FLUJO UX) ================= -->
+  <!-- ================= SALA DE ESPERA VIRTUAL ================= -->
   @if (!pacienteSeleccionado()) {
     <div class="animate-fade-in-up">
-      <h3 class="text-lg font-bold text-slate-700 mb-6 flex items-center gap-2">
-        <span class="relative flex h-3 w-3">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-lg font-bold text-slate-700 flex items-center gap-2">
+          <span class="relative flex h-3 w-3">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+          </span>
+          Pacientes en Sala de Espera
+        </h3>
+        <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+          {{ pacientesEnSala().length }} Esperando
         </span>
-        Pacientes en Sala de Espera (Hoy)
-      </h3>
+      </div>
 
       @if (cargandoSala()) {
-        <div class="flex flex-col items-center justify-center py-16">
+        <div class="flex flex-col items-center justify-center py-20">
           <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin shadow-md"></div>
-          <p class="text-slate-500 font-medium mt-4 animate-pulse">Revisando la sala de espera...</p>
+          <p class="text-slate-500 font-medium mt-4 animate-pulse">Consultando recepción...</p>
         </div>
       } @else if (pacientesEnSala().length === 0) {
-        <div class="bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl p-16 text-center shadow-inner">
-          <span class="text-6xl mb-4 block drop-shadow-sm">☕</span>
+        <div class="bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl p-20 text-center shadow-inner">
+          <span class="text-6xl mb-4 block drop-shadow-sm opacity-50">☕</span>
           <h4 class="text-xl font-bold text-slate-700">No hay pacientes esperando</h4>
-          <p class="text-slate-500 mt-2 max-w-md mx-auto">Cuando la recepcionista marque la llegada de un paciente en su agenda, aparecerá su expediente aquí automáticamente.</p>
+          <p class="text-slate-500 mt-2 max-w-sm mx-auto text-sm">Aprovecha este tiempo para revisar inventarios o tomar un descanso.</p>
         </div>
       } @else {
-        <!-- Tarjetas de Pacientes en Espera -->
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           @for (cita of pacientesEnSala(); track cita.id) {
-            <div (click)="atenderPaciente(cita)" class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-xl hover:-translate-y-1 hover:border-blue-300 transition-all duration-300 relative overflow-hidden group cursor-pointer">
+            <div (click)="atenderPaciente(cita)" class="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 hover:border-blue-300 transition-all duration-300 relative overflow-hidden group cursor-pointer">
               
-              <!-- Badge Superior -->
-              <div class="absolute top-0 right-0 bg-emerald-100 text-emerald-700 border-l border-b border-emerald-200 text-xs font-black px-3 py-1.5 rounded-bl-xl shadow-sm z-10 flex items-center gap-1">
+              <div class="absolute top-0 right-0 bg-gradient-to-bl from-emerald-100 to-emerald-50 text-emerald-800 border-l border-b border-emerald-200 text-xs font-black px-4 py-2 rounded-bl-2xl shadow-sm z-10 flex items-center gap-1.5">
                 <span>⏰</span> {{ cita.fechaHora | date:'h:mm a' }}
               </div>
               
-              <!-- Deco Background -->
-              <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-blue-50 rounded-full blur-2xl group-hover:bg-blue-100 transition-colors"></div>
+              <div class="absolute -right-12 -bottom-12 w-40 h-40 bg-blue-50 rounded-full blur-3xl group-hover:bg-blue-100 transition-colors"></div>
 
-              <div class="flex items-center gap-4 mb-5 relative z-10">
-                <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-full flex items-center justify-center font-bold text-2xl shadow-md border-2 border-white ring-2 ring-blue-50">
+              <div class="flex items-center gap-4 mb-6 relative z-10">
+                <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-full flex items-center justify-center font-bold text-2xl shadow-md border-[3px] border-white ring-1 ring-slate-100">
                   {{ cita.pacienteNombreCompleto?.charAt(0) || 'P' }}
                 </div>
-                <div class="flex-1 min-w-0">
-                  <h4 class="font-bold text-slate-800 truncate text-lg">{{ cita.pacienteNombreCompleto }}</h4>
-                  <p class="text-xs text-slate-400 font-medium">Paciente Registrado</p>
+                <div class="flex-1 min-w-0 pt-2">
+                  <h4 class="font-bold text-slate-800 truncate text-lg leading-none">{{ cita.pacienteNombreCompleto }}</h4>
+                  <p class="text-xs text-blue-500 font-bold mt-1.5">ID: #{{ cita.pacienteId }}</p>
                 </div>
               </div>
               
-              <div class="bg-slate-50 rounded-xl p-3 mb-4 border border-slate-100 relative z-10">
-                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Motivo de Atención:</p>
-                <p class="text-sm text-slate-700 font-medium line-clamp-2" [title]="cita.motivo">{{ cita.motivo }}</p>
+              <div class="bg-slate-50 rounded-2xl p-4 mb-5 border border-slate-100 relative z-10">
+                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1.5 flex items-center gap-1"><span>💬</span> Motivo de Consulta</p>
+                <p class="text-sm text-slate-700 font-medium line-clamp-2 leading-relaxed" [title]="cita.motivo">{{ cita.motivo }}</p>
               </div>
 
-              <button class="w-full bg-blue-50 text-blue-600 border border-blue-100 font-bold py-2.5 rounded-xl group-hover:bg-blue-600 group-hover:text-white group-hover:shadow-md group-hover:shadow-blue-500/30 transition-all flex justify-center items-center gap-2 relative z-10">
-                Llamar a Consultorio <span>→</span>
+              <button class="w-full bg-blue-50 text-blue-600 border border-blue-100 font-bold py-3 rounded-xl group-hover:bg-blue-600 group-hover:text-white group-hover:shadow-md group-hover:shadow-blue-500/30 transition-all flex justify-center items-center gap-2 relative z-10">
+                Llamar e Iniciar Atención <span>→</span>
               </button>
             </div>
           }
@@ -85,54 +87,63 @@
     </div>
   }
 
-  <!-- ================= EXPEDIENTE CLÍNICO DEL PACIENTE SELECCIONADO ================= -->
   @if (pacienteSeleccionado()) {
     
-    <!-- Spinner bloqueador -->
     @if (cargando() && !fichaActual()) {
-      <div class="absolute inset-0 bg-white/90 backdrop-blur-sm z-20 flex flex-col justify-center items-center rounded-xl">
-        <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin drop-shadow-md"></div>
-        <span class="mt-4 font-bold text-blue-600 animate-pulse">Abriendo expediente...</span>
+      <div class="absolute inset-0 bg-white/90 backdrop-blur-sm z-20 flex flex-col justify-center items-center rounded-3xl">
+        <div class="w-14 h-14 border-4 border-blue-500 border-t-transparent rounded-full animate-spin drop-shadow-md"></div>
+        <span class="mt-4 font-bold text-blue-600 animate-pulse tracking-wide">Abriendo expediente...</span>
       </div>
     }
 
     <div class="animate-fade-in-up" [class.opacity-50]="cargando()">
       
-      <!-- Botón de Volver y Nombre del Paciente -->
-      <div class="flex items-center gap-4 mb-6">
-        <button (click)="volverASalaEspera()" class="p-2 hover:bg-slate-100 rounded-lg text-slate-500 hover:text-slate-800 transition-colors" title="Volver a Sala de Espera">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-        </button>
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 bg-slate-800 text-white rounded-full flex justify-center items-center font-bold text-xl">{{ fichaActual()?.pacienteNombreCompleto?.charAt(0) || 'P' }}</div>
-          <div>
-            <h3 class="text-xl font-black text-slate-800 leading-none">{{ fichaActual()?.pacienteNombreCompleto }}</h3>
-            <span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">En Atención</span>
+      <!-- Botón Volver y Paciente -->
+      <div class="flex items-center justify-between mb-6 bg-slate-50 p-3 pr-6 rounded-2xl border border-slate-100">
+        <div class="flex items-center gap-4">
+          <button (click)="volverASalaEspera()" class="bg-white p-2.5 shadow-sm border border-slate-200 hover:bg-slate-100 rounded-xl text-slate-500 hover:text-slate-800 transition-colors" title="Volver a Sala de Espera">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+          </button>
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-slate-800 text-white rounded-full flex justify-center items-center font-bold text-lg shadow-inner">{{ fichaActual()?.pacienteNombreCompleto?.charAt(0) || 'P' }}</div>
+            <div>
+              <h3 class="text-xl font-black text-slate-800 leading-none">{{ fichaActual()?.pacienteNombreCompleto }}</h3>
+              <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mt-1 inline-block">● Paciente Activo</span>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Tabs de Navegación Dinámicos -->
-      <div class="flex border-b border-slate-200 overflow-x-auto mb-6 bg-slate-50 rounded-t-xl px-2 pt-2">
-        <button (click)="cambiarTab('historial')" [class.border-blue-600]="tabActiva() === 'historial'" [class.text-blue-700]="tabActiva() === 'historial'" [class.bg-white]="tabActiva() === 'historial'" class="px-6 py-3 border-b-2 border-transparent text-slate-500 hover:text-slate-800 font-bold whitespace-nowrap transition-all rounded-t-lg">📋 Historial Médico</button>
-        <button (click)="cambiarTab('odontograma')" [class.border-blue-600]="tabActiva() === 'odontograma'" [class.text-blue-700]="tabActiva() === 'odontograma'" [class.bg-white]="tabActiva() === 'odontograma'" class="px-6 py-3 border-b-2 border-transparent text-slate-500 hover:text-slate-800 font-bold whitespace-nowrap transition-all rounded-t-lg">🦷 Odontograma</button>
-        <button (click)="cambiarTab('recetas')" [class.border-blue-600]="tabActiva() === 'recetas'" [class.text-blue-700]="tabActiva() === 'recetas'" [class.bg-white]="tabActiva() === 'recetas'" class="px-6 py-3 border-b-2 border-transparent text-slate-500 hover:text-slate-800 font-bold whitespace-nowrap transition-all rounded-t-lg">💊 Recetas y PDF</button>
+      <!-- Tabs de Navegación Estilizados -->
+      <div class="flex space-x-2 border-b border-slate-200 mb-8 px-2">
+        <button (click)="cambiarTab('historial')" 
+                [class.border-blue-600]="tabActiva() === 'historial'" [class.text-blue-700]="tabActiva() === 'historial'" [class.bg-blue-50]="tabActiva() === 'historial'" 
+                class="px-6 py-3.5 border-b-2 border-transparent text-slate-500 hover:text-slate-800 font-bold transition-all rounded-t-xl text-sm flex items-center gap-2">
+          <span>📋</span> Historial Clínico
+        </button>
+        <button (click)="cambiarTab('odontograma')" 
+                [class.border-blue-600]="tabActiva() === 'odontograma'" [class.text-blue-700]="tabActiva() === 'odontograma'" [class.bg-blue-50]="tabActiva() === 'odontograma'" 
+                class="px-6 py-3.5 border-b-2 border-transparent text-slate-500 hover:text-slate-800 font-bold transition-all rounded-t-xl text-sm flex items-center gap-2">
+          <span>🦷</span> Odontograma Digital
+        </button>
+        <button (click)="cambiarTab('recetas')" 
+                [class.border-blue-600]="tabActiva() === 'recetas'" [class.text-blue-700]="tabActiva() === 'recetas'" [class.bg-blue-50]="tabActiva() === 'recetas'" 
+                class="px-6 py-3.5 border-b-2 border-transparent text-slate-500 hover:text-slate-800 font-bold transition-all rounded-t-xl text-sm flex items-center gap-2">
+          <span>📝</span> Recetas Médicas
+        </button>
       </div>
 
-      <!-- ================= TAB 1: HISTORIAL MÉDICO ================= -->
       @if (tabActiva() === 'historial') {
         <form [formGroup]="fichaForm" (ngSubmit)="guardarFicha()" class="space-y-6">
         
-        <!-- Cabecera del Historial -->
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm">
+        <div class="bg-white p-6 rounded-3xl border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm">
           <div>
-            <p class="text-slate-500 text-sm font-medium">
-              Apertura del Expediente: <span class="font-bold text-slate-800">{{ $any(fichaActual())?.fechaCreacion ? ($any(fichaActual())?.fechaCreacion | date:'dd/MM/yyyy') : 'Nueva Ficha' }}</span>
-            </p>
+            <p class="text-slate-500 text-sm font-medium">Apertura del Expediente:</p>
+            <p class="font-bold text-slate-800 text-lg">{{ $any(fichaActual())?.fechaCreacion ? ($any(fichaActual())?.fechaCreacion | date:'dd/MM/yyyy') : 'Nueva Ficha' }}</p>
           </div>
-          <div class="w-full sm:w-64">
-            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Grupo Sanguíneo</label>
-            <select formControlName="tipoSangre" class="w-full border-2 border-slate-200 rounded-xl px-4 py-2 font-black text-rose-600 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors">
+          <div class="w-full sm:w-72">
+            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Grupo Sanguíneo</label>
+            <select formControlName="tipoSangre" class="w-full border-2 border-slate-200 rounded-xl px-4 py-2.5 font-black text-rose-600 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors">
               <option value="">Desconocido</option>
               <option value="A+">A+</option><option value="A-">A-</option>
               <option value="B+">B+</option><option value="B-">B-</option>
@@ -142,29 +153,29 @@
           </div>
         </div>
 
-        <!-- Antecedentes Médicos (FormArray) -->
-        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 border-b border-slate-100 pb-4">
+        <div class="bg-white rounded-3xl border border-slate-200 p-8 shadow-sm">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 border-b border-slate-100 pb-5">
             <h4 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-              <span class="text-rose-500">⚠️</span> Alertas Médicas (Alergias / Enfermedades)
+              <span class="p-1.5 bg-rose-50 text-rose-500 rounded-lg">⚠️</span> Alertas Médicas (Alergias / Enfermedades)
             </h4>
-            <button type="button" (click)="agregarAntecedente()" [disabled]="cargando()" class="bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-bold py-2 px-4 rounded-xl flex items-center gap-2 transition-colors disabled:opacity-50 shadow-sm">
+            <button type="button" (click)="agregarAntecedente()" [disabled]="cargando()" class="bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-bold py-2.5 px-5 rounded-xl flex items-center gap-2 transition-colors disabled:opacity-50 shadow-sm text-sm">
               <span>➕</span> Agregar Alerta
             </button>
           </div>
 
           <div formArrayName="antecedentes" class="space-y-4">
             @if (antecedentesFormArray.controls.length === 0) {
-              <div class="text-center p-8 bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl text-slate-500 font-medium">
-                El paciente no tiene antecedentes ni alertas médicas registradas.
+              <div class="text-center p-10 bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl text-slate-500 font-medium">
+                <span class="text-3xl mb-2 block opacity-50">👍</span>
+                El paciente no tiene alertas registradas.
               </div>
             }
 
             @for (antecedente of antecedentesFormArray.controls; track $index) {
-              <div [formGroupName]="$index" class="flex flex-col sm:flex-row items-start gap-4 bg-slate-50 p-4 border border-slate-200 rounded-xl">
+              <div [formGroupName]="$index" class="flex flex-col sm:flex-row items-start gap-4 bg-slate-50/50 p-4 border border-slate-200 rounded-2xl relative group hover:border-blue-300 transition-colors">
                 
                 <div class="w-full sm:w-1/3">
-                  <select formControlName="categoria" class="w-full border border-slate-300 rounded-lg px-3 py-2.5 focus:ring-blue-500 focus:border-blue-500 font-bold text-slate-700">
+                  <select formControlName="categoria" class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:ring-blue-500 focus:border-blue-500 font-bold text-slate-700 bg-white">
                     <option value="" disabled>Seleccione Categoría...</option>
                     <option value="Alergia">Alergia a Medicamento</option>
                     <option value="Enfermedad Crónica">Enfermedad Crónica</option>
@@ -174,164 +185,134 @@
                 </div>
                 
                 <div class="flex-1 w-full">
-                  <input type="text" formControlName="descripcion" placeholder="Describa el antecedente (Ej. Alérgico a la Penicilina)" class="w-full border border-slate-300 rounded-lg px-4 py-2.5 focus:ring-blue-500 focus:border-blue-500 font-medium text-slate-700">
+                  <input type="text" formControlName="descripcion" placeholder="Describa el antecedente..." class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:ring-blue-500 focus:border-blue-500 font-medium text-slate-700 bg-white">
                 </div>
                 
-                <button type="button" (click)="removerAntecedente($index)" [disabled]="cargando()" class="self-end sm:self-auto text-rose-500 hover:text-white bg-rose-50 hover:bg-rose-500 border border-rose-200 hover:border-rose-600 p-2.5 rounded-lg transition-all disabled:opacity-50 font-bold flex items-center justify-center shadow-sm" title="Eliminar Alerta">
-                  🗑️ <span class="sm:hidden ml-2">Eliminar</span>
+                <button type="button" (click)="removerAntecedente($index)" [disabled]="cargando()" class="self-end sm:self-auto text-rose-400 hover:text-rose-600 bg-white border-2 border-rose-100 hover:border-rose-300 p-3 rounded-xl transition-all disabled:opacity-50 font-bold shadow-sm" title="Eliminar Alerta">
+                  🗑️
                 </button>
               </div>
             }
           </div>
         </div>
 
-        <!-- Footer / Botón Guardar -->
-        <div class="flex justify-end pt-4">
-          <button type="submit" [disabled]="fichaForm.invalid || cargando()" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-xl shadow-md shadow-blue-500/30 hover:bg-blue-700 hover:-translate-y-0.5 disabled:bg-slate-400 disabled:shadow-none disabled:transform-none transition-all flex items-center gap-2">
+        <div class="flex justify-end pt-2">
+          <button type="submit" [disabled]="fichaForm.invalid || cargando()" class="bg-blue-600 text-white font-bold py-3.5 px-8 rounded-xl shadow-md shadow-blue-500/30 hover:bg-blue-700 hover:-translate-y-0.5 disabled:bg-slate-400 disabled:shadow-none transition-all flex items-center gap-2">
             @if (cargando()) {
               <div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
               Guardando...
             } @else {
-              💾 Guardar Historial Médico
+              💾 Actualizar Historial
             }
           </button>
         </div>
-
       </form>
       } <!-- Fin Tab Historial -->
 
-      <!-- ================= TAB 2: ODONTOGRAMA INTERACTIVO ================= -->
       @if (tabActiva() === 'odontograma') {
-        
         @if (!fichaActual()?.id) {
-          <div class="bg-amber-50 border border-amber-200 p-6 mb-4 rounded-xl shadow-sm flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
+          <div class="bg-amber-50 border border-amber-200 p-8 rounded-2xl shadow-sm flex items-center gap-6">
             <span class="text-5xl drop-shadow-md">⚠️</span>
             <div>
               <h4 class="text-lg font-bold text-amber-800 mb-1">Requiere Historial Clínico</h4>
-              <p class="text-amber-700 font-medium">Debes guardar los datos básicos del paciente (Pestaña "Historial Médico") antes de poder dibujar el odontograma en el sistema.</p>
+              <p class="text-amber-700 font-medium">Guarda primero los datos básicos del paciente (Pestaña "Historial Médico") para poder registrar su diagnóstico dental.</p>
             </div>
-            <button (click)="cambiarTab('historial')" class="bg-amber-600 text-white font-bold px-6 py-2.5 rounded-xl shadow-md hover:bg-amber-700 transition-colors whitespace-nowrap">
-              Ir al Historial →
-            </button>
           </div>
         } @else {
           
-          <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+          <div class="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm">
             
-            <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-8 gap-4">
-              <h3 class="text-xl font-bold text-slate-800">Mapa Dental Dinámico</h3>
+            <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-10 gap-6">
+              <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                <span class="p-2 bg-blue-50 text-blue-600 rounded-lg">🦷</span> Diagnóstico Interactivo
+              </h3>
               
-              <!-- Leyenda de colores -->
-              <div class="flex flex-wrap gap-2 text-xs font-bold bg-slate-50 p-2.5 rounded-xl border border-slate-200">
-                <span class="flex items-center gap-1.5 px-2 py-1 bg-white rounded shadow-sm border border-slate-100"><div class="w-3 h-3 rounded-full bg-white border-2 border-slate-300"></div> Sano</span>
-                <span class="flex items-center gap-1.5 px-2 py-1 bg-white rounded shadow-sm border border-slate-100"><div class="w-3 h-3 rounded-full bg-red-500"></div> Caries</span>
-                <span class="flex items-center gap-1.5 px-2 py-1 bg-white rounded shadow-sm border border-slate-100"><div class="w-3 h-3 rounded-full bg-blue-500"></div> Curación</span>
-                <span class="flex items-center gap-1.5 px-2 py-1 bg-white rounded shadow-sm border border-slate-100"><div class="w-3 h-3 rounded-full bg-slate-800"></div> Ausente</span>
-                <span class="flex items-center gap-1.5 px-2 py-1 bg-white rounded shadow-sm border border-slate-100"><div class="w-3 h-3 rounded-full bg-orange-500"></div> Extracción</span>
-                <span class="flex items-center gap-1.5 px-2 py-1 bg-white rounded shadow-sm border border-slate-100"><div class="w-3 h-3 rounded-full bg-purple-500"></div> Endodoncia</span>
+              <!-- Leyenda Premium -->
+              <div class="flex flex-wrap gap-2 text-[11px] font-bold bg-slate-50 p-2 rounded-xl border border-slate-200">
+                <span class="flex items-center gap-1.5 px-2.5 py-1.5 bg-white rounded-lg shadow-sm border border-slate-100"><div class="w-3 h-3 rounded-full bg-white border-2 border-slate-300"></div> Sano</span>
+                <span class="flex items-center gap-1.5 px-2.5 py-1.5 bg-white rounded-lg shadow-sm border border-slate-100"><div class="w-3 h-3 rounded-full bg-red-500 shadow-sm shadow-red-200"></div> Caries</span>
+                <span class="flex items-center gap-1.5 px-2.5 py-1.5 bg-white rounded-lg shadow-sm border border-slate-100"><div class="w-3 h-3 rounded-full bg-blue-500 shadow-sm shadow-blue-200"></div> Curación</span>
+                <span class="flex items-center gap-1.5 px-2.5 py-1.5 bg-white rounded-lg shadow-sm border border-slate-100"><div class="w-3 h-3 rounded-full bg-slate-800"></div> Ausente</span>
+                <span class="flex items-center gap-1.5 px-2.5 py-1.5 bg-white rounded-lg shadow-sm border border-slate-100"><div class="w-3 h-3 rounded-full bg-orange-500 shadow-sm shadow-orange-200"></div> Extracción</span>
+                <span class="flex items-center gap-1.5 px-2.5 py-1.5 bg-white rounded-lg shadow-sm border border-slate-100"><div class="w-3 h-3 rounded-full bg-purple-500 shadow-sm shadow-purple-200"></div> Endodoncia</span>
               </div>
             </div>
 
-            <div class="relative w-full overflow-x-auto pb-6">
+            <!-- Arco Dental Renderizado -->
+            <div class="relative w-full overflow-x-auto pb-8 pt-4 bg-slate-50/50 p-6 rounded-3xl border border-slate-100">
               
               @if (cargandoOdontograma()) {
-                <div class="absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex flex-col justify-center items-center rounded-xl">
+                <div class="absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex flex-col justify-center items-center rounded-3xl">
                   <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                  <span class="text-blue-600 font-bold mt-3 animate-pulse">Sincronizando dientes...</span>
+                  <span class="text-blue-600 font-bold mt-3 animate-pulse">Sincronizando dentición...</span>
                 </div>
               }
 
-              <!-- Cuadrícula Superior (Piezas 18 a 28) -->
-              <div class="flex justify-center gap-1 sm:gap-2 mb-8 min-w-max">
-                <!-- Cuadrante Superior Derecho (18 a 11) -->
-                <div class="flex gap-1 sm:gap-2 border-r-[3px] border-slate-300 pr-2 sm:pr-4">
-                  @for (diente of dientes().slice(0, 8); track diente.numeroPieza) {
-                    <div (click)="abrirModalDiente(diente)" class="flex flex-col items-center cursor-pointer group hover:-translate-y-1 transition-transform">
-                      <span class="text-[11px] sm:text-xs font-black text-slate-400 mb-1">{{ diente.numeroPieza }}</span>
-                      <div class="w-9 h-12 sm:w-11 sm:h-14 border-2 rounded-lg shadow-sm flex items-center justify-center transition-colors relative overflow-hidden"
-                           [ngClass]="getColorDiente(diente.estadoDiagnostico)" [title]="diente.estadoDiagnostico">
-                        <span class="text-[10px] text-white/95 font-black block overflow-hidden text-ellipsis whitespace-nowrap w-full text-center px-1 z-10 drop-shadow-md">
-                          {{ diente.estadoDiagnostico !== 'Sano' ? diente.estadoDiagnostico.slice(0,3).toUpperCase() : '' }}
-                        </span>
-                        @if (diente.estadoDiagnostico !== 'Sano') {
-                          <div class="absolute inset-0 bg-white/10"></div>
-                        }
+              <div class="flex flex-col items-center gap-8 max-w-4xl mx-auto min-w-max">
+                  
+                  <!-- Maxilar Superior -->
+                  <div class="flex gap-2 sm:gap-4 items-end">
+                      <div class="flex gap-1.5 border-r-[4px] border-slate-300 pr-4">
+                          @for (diente of dientes().slice(0, 8); track diente.numeroPieza) {
+                              <div (click)="abrirModalDiente(diente)" class="flex flex-col items-center group">
+                                  <span class="text-[10px] font-black text-slate-400 mb-2 group-hover:text-blue-500 transition-colors">{{ diente.numeroPieza }}</span>
+                                  <div [class]="getColorDiente(diente.estadoDiagnostico)" class="rounded-t-3xl rounded-b-lg">
+                                      <span class="text-[10px] text-white font-black truncate px-1 drop-shadow-sm">{{ diente.estadoDiagnostico !== 'Sano' ? diente.estadoDiagnostico.slice(0,3) : '' }}</span>
+                                  </div>
+                              </div>
+                          }
                       </div>
-                    </div>
-                  }
-                </div>
-                
-                <!-- Cuadrante Superior Izquierdo (21 a 28) -->
-                <div class="flex gap-1 sm:gap-2 pl-2 sm:pl-4">
-                  @for (diente of dientes().slice(8, 16); track diente.numeroPieza) {
-                    <div (click)="abrirModalDiente(diente)" class="flex flex-col items-center cursor-pointer group hover:-translate-y-1 transition-transform">
-                      <span class="text-[11px] sm:text-xs font-black text-slate-400 mb-1">{{ diente.numeroPieza }}</span>
-                      <div class="w-9 h-12 sm:w-11 sm:h-14 border-2 rounded-lg shadow-sm flex items-center justify-center transition-colors relative overflow-hidden"
-                           [ngClass]="getColorDiente(diente.estadoDiagnostico)" [title]="diente.estadoDiagnostico">
-                        <span class="text-[10px] text-white/95 font-black block overflow-hidden text-ellipsis whitespace-nowrap w-full text-center px-1 z-10 drop-shadow-md">
-                          {{ diente.estadoDiagnostico !== 'Sano' ? diente.estadoDiagnostico.slice(0,3).toUpperCase() : '' }}
-                        </span>
-                        @if (diente.estadoDiagnostico !== 'Sano') {
-                          <div class="absolute inset-0 bg-white/10"></div>
-                        }
+                      <div class="flex gap-1.5 pl-4">
+                          @for (diente of dientes().slice(8, 16); track diente.numeroPieza) {
+                              <div (click)="abrirModalDiente(diente)" class="flex flex-col items-center group">
+                                  <span class="text-[10px] font-black text-slate-400 mb-2 group-hover:text-blue-500 transition-colors">{{ diente.numeroPieza }}</span>
+                                  <div [class]="getColorDiente(diente.estadoDiagnostico)" class="rounded-t-3xl rounded-b-lg">
+                                      <span class="text-[10px] text-white font-black truncate px-1 drop-shadow-sm">{{ diente.estadoDiagnostico !== 'Sano' ? diente.estadoDiagnostico.slice(0,3) : '' }}</span>
+                                  </div>
+                              </div>
+                          }
                       </div>
-                    </div>
-                  }
-                </div>
+                  </div>
+
+                  <div class="w-full h-1 bg-slate-200 rounded-full my-2 relative">
+                    <div class="absolute inset-0 bg-gradient-to-r from-transparent via-slate-300 to-transparent"></div>
+                  </div>
+
+                  <!-- Maxilar Inferior -->
+                  <div class="flex gap-2 sm:gap-4 items-start">
+                      <div class="flex gap-1.5 border-r-[4px] border-slate-300 pr-4">
+                          @for (diente of dientes().slice(16, 24); track diente.numeroPieza) {
+                              <div (click)="abrirModalDiente(diente)" class="flex flex-col items-center group">
+                                  <div [class]="getColorDiente(diente.estadoDiagnostico)" class="rounded-b-3xl rounded-t-lg">
+                                       <span class="text-[10px] text-white font-black truncate px-1 drop-shadow-sm">{{ diente.estadoDiagnostico !== 'Sano' ? diente.estadoDiagnostico.slice(0,3) : '' }}</span>
+                                  </div>
+                                  <span class="text-[10px] font-black text-slate-400 mt-2 group-hover:text-blue-500 transition-colors">{{ diente.numeroPieza }}</span>
+                              </div>
+                          }
+                      </div>
+                      <div class="flex gap-1.5 pl-4">
+                          @for (diente of dientes().slice(24, 32); track diente.numeroPieza) {
+                              <div (click)="abrirModalDiente(diente)" class="flex flex-col items-center group">
+                                  <div [class]="getColorDiente(diente.estadoDiagnostico)" class="rounded-b-3xl rounded-t-lg">
+                                       <span class="text-[10px] text-white font-black truncate px-1 drop-shadow-sm">{{ diente.estadoDiagnostico !== 'Sano' ? diente.estadoDiagnostico.slice(0,3) : '' }}</span>
+                                  </div>
+                                  <span class="text-[10px] font-black text-slate-400 mt-2 group-hover:text-blue-500 transition-colors">{{ diente.numeroPieza }}</span>
+                              </div>
+                          }
+                      </div>
+                  </div>
+
               </div>
-
-              <!-- Línea horizontal central -->
-              <div class="w-full h-1 bg-gradient-to-r from-transparent via-slate-300 to-transparent my-4 max-w-4xl mx-auto min-w-max"></div>
-
-              <!-- Cuadrícula Inferior (Piezas 48 a 38) -->
-              <div class="flex justify-center gap-1 sm:gap-2 mt-8 min-w-max">
-                <!-- Cuadrante Inferior Derecho (48 a 41) -->
-                <div class="flex gap-1 sm:gap-2 border-r-[3px] border-slate-300 pr-2 sm:pr-4">
-                  @for (diente of dientes().slice(16, 24); track diente.numeroPieza) {
-                    <div (click)="abrirModalDiente(diente)" class="flex flex-col items-center cursor-pointer group hover:translate-y-1 transition-transform">
-                      <div class="w-9 h-12 sm:w-11 sm:h-14 border-2 rounded-lg shadow-sm flex items-center justify-center transition-colors relative overflow-hidden"
-                           [ngClass]="getColorDiente(diente.estadoDiagnostico)" [title]="diente.estadoDiagnostico">
-                        <span class="text-[10px] text-white/95 font-black block overflow-hidden text-ellipsis whitespace-nowrap w-full text-center px-1 z-10 drop-shadow-md">
-                          {{ diente.estadoDiagnostico !== 'Sano' ? diente.estadoDiagnostico.slice(0,3).toUpperCase() : '' }}
-                        </span>
-                        @if (diente.estadoDiagnostico !== 'Sano') {
-                          <div class="absolute inset-0 bg-white/10"></div>
-                        }
-                      </div>
-                      <span class="text-[11px] sm:text-xs font-black text-slate-400 mt-2">{{ diente.numeroPieza }}</span>
-                    </div>
-                  }
-                </div>
-                
-                <!-- Cuadrante Inferior Izquierdo (31 a 38) -->
-                <div class="flex gap-1 sm:gap-2 pl-2 sm:pl-4">
-                  @for (diente of dientes().slice(24, 32); track diente.numeroPieza) {
-                    <div (click)="abrirModalDiente(diente)" class="flex flex-col items-center cursor-pointer group hover:translate-y-1 transition-transform">
-                      <div class="w-9 h-12 sm:w-11 sm:h-14 border-2 rounded-lg shadow-sm flex items-center justify-center transition-colors relative overflow-hidden"
-                           [ngClass]="getColorDiente(diente.estadoDiagnostico)" [title]="diente.estadoDiagnostico">
-                        <span class="text-[10px] text-white/95 font-black block overflow-hidden text-ellipsis whitespace-nowrap w-full text-center px-1 z-10 drop-shadow-md">
-                          {{ diente.estadoDiagnostico !== 'Sano' ? diente.estadoDiagnostico.slice(0,3).toUpperCase() : '' }}
-                        </span>
-                        @if (diente.estadoDiagnostico !== 'Sano') {
-                          <div class="absolute inset-0 bg-white/10"></div>
-                        }
-                      </div>
-                      <span class="text-[11px] sm:text-xs font-black text-slate-400 mt-2">{{ diente.numeroPieza }}</span>
-                    </div>
-                  }
-                </div>
-              </div>
-
             </div>
 
             <!-- Footer Guardar Odontograma -->
-            <div class="flex justify-end pt-6 mt-4 border-t border-slate-100">
-              <button (click)="guardarOdontograma()" [disabled]="cargandoOdontograma()" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-xl shadow-md shadow-blue-500/30 hover:bg-blue-700 transition-all hover:-translate-y-0.5 flex items-center gap-2 disabled:bg-slate-400 disabled:shadow-none disabled:transform-none">
+            <div class="flex justify-end pt-8 mt-4 border-t border-slate-100">
+              <button (click)="guardarOdontograma()" [disabled]="cargandoOdontograma()" class="bg-blue-600 text-white font-bold py-3.5 px-8 rounded-xl shadow-md shadow-blue-500/30 hover:bg-blue-700 transition-all hover:-translate-y-0.5 flex items-center gap-2 disabled:bg-slate-400 disabled:shadow-none">
                 @if (cargandoOdontograma()) {
                   <div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  Guardando Mapa Dental...
+                  Guardando Mapa...
                 } @else {
-                  🦷 Guardar Odontograma
+                  💾 Guardar Odontograma
                 }
               </button>
             </div>
@@ -339,49 +320,73 @@
         }
       } <!-- Fin Tab Odontograma -->
 
-      <!-- ================= TAB 3: RECETAS ================= -->
       @if (tabActiva() === 'recetas') {
-        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+        <div class="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm">
           
           <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
-            <span class="text-blue-500">📄</span> Prescripción Médica
+            <span class="p-2 bg-blue-50 text-blue-600 rounded-lg">📄</span> Emisión de Recetas (Prescripciones)
           </h3>
           
-          <div class="mb-8 bg-slate-50 p-6 rounded-xl border border-slate-200">
-            <label class="block text-sm font-bold text-slate-700 mb-2">Seleccione la Cita Actual / Pasada:</label>
-            <select (change)="onCitaRecetaChange($event)" class="w-full xl:w-2/3 border-2 border-slate-200 rounded-xl px-4 py-3 bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-bold text-slate-700 shadow-sm cursor-pointer transition-colors">
-              <option value="" disabled selected>-- Elija una cita del paciente para adjuntar la receta --</option>
+          <div class="mb-8 bg-slate-50 p-6 rounded-2xl border border-slate-100">
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 ml-1">Seleccionar Cita Médica</label>
+            <select (change)="onCitaRecetaChange($event)" class="w-full xl:w-2/3 border-2 border-slate-200 rounded-xl px-4 py-3.5 bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-bold text-slate-700 shadow-sm cursor-pointer transition-colors">
+              <option value="" disabled selected>-- Elija la cita a la que pertenece esta receta --</option>
               @for (c of citasPaciente(); track c.id) {
-                <option [value]="c.id">{{ c.fechaHora | date:'dd/MM/yyyy h:mm a' }} - Motivo: {{ c.motivo }}</option>
+                <option [value]="c.id">{{ c.fechaHora | date:'dd/MM/yyyy h:mm a' }} - {{ c.motivo }}</option>
               }
             </select>
             
             @if (citasPaciente().length === 0) {
               <p class="text-sm font-bold text-rose-500 mt-3 flex items-center gap-1">
-                <span>⚠️</span> El paciente no tiene citas registradas. Debes agendarlo primero en Recepción.
+                <span>⚠️</span> No hay citas registradas. (Debe existir una cita para atar la receta).
               </p>
             }
           </div>
 
           @if (citaSeleccionadaParaReceta()) {
-            <form [formGroup]="recetaForm" (ngSubmit)="guardarReceta()">
-              <div class="mb-6">
-                <label class="block text-sm font-bold text-slate-700 mb-2 flex justify-between">
-                  <span>Indicaciones Farmacológicas (Rx):</span>
-                </label>
-                <textarea formControlName="indicaciones" rows="8" class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-mono text-sm shadow-inner bg-slate-50/50" placeholder="Ej:&#10;1. Ibuprofeno 400mg cada 8 hrs por 3 días.&#10;2. Amoxicilina 500mg cada 8 hrs por 7 días."></textarea>
+            
+            <!-- Grid de Recetas (Plantillas + Editor) -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              
+              <!-- Herramientas / Plantillas -->
+              <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100 h-fit">
+                  <h4 class="font-bold text-slate-700 mb-4 flex items-center gap-2 text-sm uppercase tracking-wider">
+                    <span>⚡</span> Plantillas Rápidas
+                  </h4>
+                  <div class="space-y-3">
+                      @for (p of plantillasReceta; track p.nombre) {
+                          <button type="button" (click)="usarPlantilla(p.texto)" class="w-full text-left p-4 bg-white border border-slate-200 rounded-xl hover:border-blue-400 hover:shadow-md transition-all shadow-sm group">
+                              <p class="font-bold text-slate-800 text-sm flex items-center gap-2 mb-1 group-hover:text-blue-600 transition-colors">
+                                <span>{{ p.icono }}</span> {{ p.nombre }}
+                              </p>
+                              <p class="text-[10px] font-medium text-slate-500 truncate">{{ p.texto }}</p>
+                          </button>
+                      }
+                  </div>
               </div>
 
-              <div class="flex flex-col sm:flex-row justify-end gap-4 pt-4 border-t border-slate-100">
-                <button type="submit" [disabled]="recetaForm.invalid || cargandoReceta()" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-xl shadow-md shadow-blue-500/30 hover:bg-blue-700 hover:-translate-y-0.5 transition-all disabled:bg-slate-400 disabled:shadow-none disabled:transform-none">
-                  {{ cargandoReceta() ? 'Guardando...' : '💾 Guardar Receta en Historial' }}
-                </button>
-                
-                <button type="button" (click)="descargarPdfReceta()" [disabled]="!recetaActual()?.id" class="bg-rose-500 text-white font-bold py-3 px-8 rounded-xl shadow-md shadow-rose-500/30 hover:bg-rose-600 hover:-translate-y-0.5 transition-all disabled:bg-slate-300 disabled:text-slate-500 disabled:shadow-none disabled:transform-none flex items-center justify-center gap-2">
-                  <span class="text-xl">🖨️</span> Ver / Imprimir PDF
-                </button>
+              <!-- Editor (Prescription Pad) -->
+              <div class="lg:col-span-2">
+                <form [formGroup]="recetaForm" (ngSubmit)="guardarReceta()" class="h-full flex flex-col">
+                  
+                  <div class="flex-1 bg-yellow-50/30 p-2 rounded-2xl border-2 border-slate-200 focus-within:border-blue-400 focus-within:ring-4 focus-within:ring-blue-500/10 transition-all shadow-inner">
+                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest px-3 pt-2 mb-2">Rx (Indicaciones Farmacológicas)</label>
+                    <textarea formControlName="indicaciones" rows="12" class="w-full bg-transparent border-none focus:ring-0 text-slate-700 font-medium px-3 resize-y" placeholder="Escriba la receta o use una plantilla de la izquierda..."></textarea>
+                  </div>
+
+                  <div class="flex flex-col sm:flex-row justify-end gap-3 pt-6 mt-4 border-t border-slate-100">
+                    <button type="submit" [disabled]="recetaForm.invalid || cargandoReceta()" class="bg-blue-600 text-white font-bold py-3.5 px-8 rounded-xl shadow-md shadow-blue-500/30 hover:bg-blue-700 hover:-translate-y-0.5 transition-all disabled:bg-slate-400 disabled:shadow-none">
+                      {{ cargandoReceta() ? 'Guardando...' : '💾 Guardar Receta' }}
+                    </button>
+                    
+                    <button type="button" (click)="descargarPdfReceta()" [disabled]="!recetaActual()?.id" class="bg-slate-800 text-white font-bold py-3.5 px-8 rounded-xl shadow-md hover:bg-slate-900 hover:-translate-y-0.5 transition-all disabled:bg-slate-300 disabled:text-slate-500 disabled:shadow-none flex items-center justify-center gap-2">
+                      <span class="text-lg">🖨️</span> Exportar PDF
+                    </button>
+                  </div>
+                </form>
               </div>
-            </form>
+
+            </div>
           }
         </div>
       } <!-- Fin Tab Recetas -->
@@ -390,12 +395,11 @@
   }
 </div>
 
-<!-- ================= MODAL DE ESTADO DENTAL ================= -->
 @if (mostrarModalDiente() && dienteSeleccionado()) {
   <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-fade-in-up">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden animate-fade-in-up">
       
-      <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+      <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50">
         <h3 class="text-xl font-black text-slate-800 flex items-center gap-2">
           <span class="text-2xl drop-shadow-sm">🦷</span> Pieza {{ dienteSeleccionado()?.numeroPieza }}
         </h3>
@@ -403,7 +407,7 @@
       </div>
 
       <div class="p-6 bg-white">
-        <div class="space-y-5">
+        <div class="space-y-6">
           
           <div>
             <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Diagnóstico / Estado</label>
@@ -419,15 +423,15 @@
           
           <div>
             <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Observaciones Clínicas</label>
-            <textarea #obsInput [value]="dienteSeleccionado()?.observaciones || ''" rows="3" class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm font-medium text-slate-700 bg-slate-50 focus:bg-white transition-colors shadow-inner" placeholder="Ej: Caries profunda, dolor al frío..."></textarea>
+            <textarea #obsInput [value]="dienteSeleccionado()?.observaciones || ''" rows="3" class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm font-medium text-slate-700 bg-slate-50 focus:bg-white transition-colors shadow-inner" placeholder="Ej: Caries oclusal profunda..."></textarea>
           </div>
 
         </div>
       </div>
 
       <div class="px-6 py-5 border-t border-slate-100 bg-slate-50 flex justify-end gap-3">
-        <button (click)="cerrarModalDiente()" class="px-5 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-700 hover:bg-slate-100 font-bold transition-colors shadow-sm">Cancelar</button>
-        <button (click)="actualizarDienteTemporal(estadoSelect.value, obsInput.value)" class="px-5 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-bold shadow-md shadow-blue-500/30 hover:-translate-y-0.5 transition-all">
+        <button (click)="cerrarModalDiente()" class="px-5 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-700 hover:bg-slate-100 font-bold transition-colors shadow-sm text-sm">Cancelar</button>
+        <button (click)="actualizarDienteTemporal(estadoSelect.value, obsInput.value)" class="px-6 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-bold shadow-md shadow-blue-500/30 hover:-translate-y-0.5 transition-all text-sm">
           Aplicar Diagnóstico
         </button>
       </div>

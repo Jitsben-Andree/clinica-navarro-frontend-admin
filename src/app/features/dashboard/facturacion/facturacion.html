@@ -1,18 +1,18 @@
 <div class="animate-fade-in-up">
   
   <!-- Cabecera -->
-  <div class="mb-6">
-    <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
-      <span>💰</span> Caja y Facturación
+  <div class="mb-6 border-b border-slate-100 pb-4">
+    <h2 class="text-3xl font-black text-slate-800 flex items-center gap-3">
+      <span class="p-2 bg-emerald-50 text-emerald-600 rounded-xl">💳</span> Facturación y Pagos
     </h2>
-    <p class="text-gray-500 text-sm mt-1">Selecciona una cita, agrega los tratamientos realizados y procesa el cobro.</p>
+    <p class="text-slate-500 text-sm mt-2 font-medium">Sincronización inteligente con el consultorio clínico y procesamiento de cobros.</p>
   </div>
 
   <!-- Buscadores -->
-  <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm mb-6 flex flex-col md:flex-row gap-4">
+  <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm mb-6 flex flex-col md:flex-row gap-6 relative z-20">
     <div class="flex-1">
-      <label class="block text-xs font-bold text-gray-500 uppercase mb-1">1. Buscar Paciente</label>
-      <select (change)="onPacienteChange($event)" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-blue-500 focus:border-blue-500 font-medium">
+      <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">1. Buscar Paciente</label>
+      <select (change)="onPacienteChange($event)" class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-bold text-slate-700 transition-colors shadow-sm">
         <option value="" disabled selected>-- Seleccione un paciente --</option>
         @for (p of pacientes(); track p.id) {
           <option [value]="p.id">{{ p.nombres }} {{ p.apellidos }} (DNI: {{ p.dni }})</option>
@@ -21,8 +21,8 @@
     </div>
 
     <div class="flex-1">
-      <label class="block text-xs font-bold text-gray-500 uppercase mb-1">2. Seleccionar Cita a Cobrar</label>
-      <select [disabled]="!pacienteSeleccionado()" (change)="onCitaChange($event)" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-blue-500 focus:border-blue-500 font-medium disabled:bg-gray-100">
+      <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">2. Seleccionar Cita a Cobrar</label>
+      <select [disabled]="!pacienteSeleccionado()" (change)="onCitaChange($event)" class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-bold text-slate-700 transition-colors shadow-sm disabled:opacity-50">
         <option value="" disabled selected>-- Seleccione una cita --</option>
         @for (c of citas(); track c.id) {
           <option [value]="c.id">{{ c.fechaHora | date:'dd/MM/yyyy h:mm a' }} (Estado: {{ c.estado }})</option>
@@ -31,41 +31,67 @@
     </div>
   </div>
 
-  <!-- Área Principal (Dos columnas si hay una cita seleccionada) -->
+  <!-- Área Principal -->
   @if (citaSeleccionada()) {
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 relative" [class.opacity-50]="cargando()">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 relative" [class.opacity-60]="cargando()">
       
       @if (cargando()) {
-        <div class="absolute inset-0 z-10 flex justify-center items-center">
-          <div class="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        <div class="absolute inset-0 z-50 flex justify-center items-center bg-white/50 backdrop-blur-sm rounded-3xl">
+          <div class="w-14 h-14 border-4 border-blue-500 border-t-transparent rounded-full animate-spin shadow-lg"></div>
         </div>
       }
 
       <!-- COLUMNA IZQUIERDA: Detalle de Tratamientos -->
       <div class="lg:col-span-2 space-y-6">
         
-        <!-- Formulario para agregar tratamiento (Oculto si ya se pagó) -->
-        @if (!pagoActual()) {
-          <div class="bg-blue-50 border border-blue-100 rounded-xl p-5 shadow-sm">
-            <h3 class="text-sm font-bold text-blue-800 uppercase mb-3 flex items-center gap-2">
-              <span>➕</span> Agregar Servicio Realizado
+        <!-- MAGIA UX: Sinergia Clínica (Sugerencias del Odontograma) -->
+        @if (sugerenciasClinicas().length > 0 && !pagoActual()) {
+          <div class="bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-100 rounded-3xl p-6 shadow-sm relative overflow-hidden animate-fade-in-up">
+            <div class="absolute -right-6 -top-6 text-7xl opacity-20">🤖</div>
+            <h3 class="text-indigo-800 font-black flex items-center gap-2 mb-2 text-lg">
+              <span class="text-2xl drop-shadow-sm">✨</span> Sinergia Clínica Detectada
             </h3>
-            <form [formGroup]="tratamientoForm" (ngSubmit)="agregarTratamiento()" class="flex flex-col md:flex-row gap-3 items-end">
+            <p class="text-sm font-medium text-indigo-600/80 mb-5 max-w-lg">El sistema ha leído el odontograma de este paciente y detectó procedimientos médicos no cobrados. Puedes añadirlos con un clic.</p>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              @for (sug of sugerenciasClinicas(); track sug.pieza) {
+                <div class="bg-white rounded-2xl p-4 shadow-sm border border-indigo-50 flex justify-between items-center group hover:shadow-md hover:border-indigo-200 transition-all">
+                  <div>
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Pieza {{ sug.pieza }} ({{ sug.estado }})</p>
+                    <p class="font-bold text-slate-800 text-sm">{{ sug.servicio.nombre }}</p>
+                    <p class="text-indigo-600 font-black text-sm mt-1">S/. {{ sug.servicio.precioBase | number:'1.2-2' }}</p>
+                  </div>
+                  <button type="button" (click)="aplicarSugerencia(sug)" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white w-12 h-12 rounded-xl flex items-center justify-center transition-all shadow-sm font-black text-xl hover:-translate-y-1 hover:shadow-indigo-500/30" title="Añadir a la cuenta">
+                    +
+                  </button>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Formulario Manual para agregar tratamiento (Oculto si ya se pagó) -->
+        @if (!pagoActual()) {
+          <div class="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
+            <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4 flex items-center gap-2">
+              <span class="text-blue-500">➕</span> Agregar Servicio Manual
+            </h3>
+            <form [formGroup]="tratamientoForm" (ngSubmit)="agregarTratamiento()" class="flex flex-col md:flex-row gap-4 items-end">
               <div class="flex-1 w-full">
-                <label class="block text-xs font-medium text-gray-600 mb-1">Tratamiento Catálogo</label>
-                <select formControlName="servicioId" (change)="onServicioChange($event)" class="w-full border border-blue-200 rounded px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Catálogo</label>
+                <select formControlName="servicioId" (change)="onServicioChange($event)" class="w-full border-2 border-slate-200 bg-slate-50 rounded-xl px-4 py-3 text-sm font-bold focus:bg-white focus:ring-blue-500 focus:border-blue-500 transition-colors">
                   <option [value]="0" disabled>-- Elegir Tratamiento --</option>
                   @for (s of servicios(); track s.id) {
                     <option [value]="s.id">{{ s.nombre }} (Base: S/.{{ s.precioBase }})</option>
                   }
                 </select>
               </div>
-              <div class="w-full md:w-32">
-                <label class="block text-xs font-medium text-gray-600 mb-1">Cobrado (S/.)</label>
-                <input type="number" step="0.1" formControlName="precioCobrado" class="w-full border border-blue-200 rounded px-3 py-2 text-sm font-bold text-green-700 focus:ring-blue-500 focus:border-blue-500">
+              <div class="w-full md:w-36">
+                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Cobrado (S/.)</label>
+                <input type="number" step="0.1" formControlName="precioCobrado" class="w-full border-2 border-emerald-200 bg-emerald-50/50 rounded-xl px-4 py-3 text-sm font-black text-emerald-700 focus:bg-white focus:ring-emerald-500 focus:border-emerald-500 transition-colors">
               </div>
               <div class="w-full md:w-auto">
-                <button type="submit" [disabled]="tratamientoForm.invalid" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded shadow hover:bg-blue-700 disabled:bg-blue-300 transition-colors">
+                <button type="submit" [disabled]="tratamientoForm.invalid" class="w-full md:w-auto bg-blue-600 text-white font-bold py-3 px-6 rounded-xl shadow-md shadow-blue-500/20 hover:bg-blue-700 hover:-translate-y-0.5 disabled:bg-slate-300 disabled:shadow-none transition-all">
                   Añadir
                 </button>
               </div>
@@ -73,33 +99,45 @@
           </div>
         }
 
-        <!-- Tabla de Tratamientos -->
-        <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-          <div class="px-5 py-3 border-b border-gray-100 bg-gray-50">
-            <h3 class="font-bold text-gray-700">Detalle de la Cuenta</h3>
+        <!-- Tabla de Tratamientos (Carrito) -->
+        <div class="bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden">
+          <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
+            <h3 class="font-black text-slate-800">Detalle de la Cuenta (Carrito)</h3>
           </div>
           <div class="p-0">
             @if (tratamientos().length === 0) {
-              <div class="p-8 text-center text-gray-400 italic">No hay tratamientos registrados en esta cita.</div>
+              <div class="p-12 text-center text-slate-400 font-medium">
+                <span class="text-4xl block mb-3 opacity-50">🛒</span>
+                No hay tratamientos registrados en esta cita aún.
+              </div>
             } @else {
               <table class="w-full text-left">
-                <thead class="bg-gray-50 border-b border-gray-100 text-xs uppercase text-gray-500">
+                <thead class="bg-white border-b border-slate-100 text-[10px] font-black uppercase tracking-widest text-slate-400">
                   <tr>
-                    <th class="px-5 py-3">Servicio</th>
-                    <th class="px-5 py-3 text-right">Precio (S/.)</th>
+                    <th class="px-6 py-4">Servicio Aplicado</th>
+                    <th class="px-6 py-4 text-right">Monto (S/.)</th>
                     @if (!pagoActual()) {
-                      <th class="px-5 py-3 text-center">Quitar</th>
+                      <th class="px-6 py-4 text-center">Acción</th>
                     }
                   </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100">
+                <tbody class="divide-y divide-slate-50 bg-slate-50/30">
                   @for (t of tratamientos(); track t.id) {
-                    <tr class="hover:bg-gray-50">
-                      <td class="px-5 py-3 text-sm font-medium text-gray-800">{{ t.servicioNombre }}</td>
-                      <td class="px-5 py-3 text-sm font-bold text-gray-700 text-right">{{ t.precioCobrado | number:'1.2-2' }}</td>
+                    <tr class="hover:bg-white transition-colors">
+                      <td class="px-6 py-4">
+                        <span class="text-sm font-bold text-slate-800 block">{{ t.servicioNombre }}</span>
+                        @if (t.observaciones) {
+                          <span class="text-[10px] text-slate-400 font-semibold uppercase">{{ t.observaciones }}</span>
+                        }
+                      </td>
+                      <td class="px-6 py-4 text-sm font-black text-slate-700 text-right">
+                        {{ t.precioCobrado | number:'1.2-2' }}
+                      </td>
                       @if (!pagoActual()) {
-                        <td class="px-5 py-3 text-center">
-                          <button (click)="eliminarTratamiento(t.id)" class="text-red-500 hover:text-red-700 transition-colors" title="Eliminar">🗑️</button>
+                        <td class="px-6 py-4 text-center">
+                          <button (click)="eliminarTratamiento(t.id)" class="w-8 h-8 bg-white border border-rose-100 text-rose-500 rounded-lg hover:bg-rose-500 hover:text-white transition-colors shadow-sm font-bold" title="Quitar">
+                            &times;
+                          </button>
                         </td>
                       }
                     </tr>
@@ -115,23 +153,30 @@
       <!-- COLUMNA DERECHA: Resumen y Pago -->
       <div class="space-y-6">
         
-        <!-- Tarjeta de Total -->
-        <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-6 shadow-lg text-white">
-          <p class="text-slate-400 text-sm font-medium uppercase tracking-wider mb-1">Total a Pagar</p>
-          <h2 class="text-4xl font-bold text-green-400 mb-4">S/. {{ totalAPagar() | number:'1.2-2' }}</h2>
-          <div class="h-px w-full bg-slate-700 mb-4"></div>
-          <p class="text-sm text-slate-300">Paciente: <span class="font-bold text-white">{{ citaSeleccionada()?.pacienteNombreCompleto }}</span></p>
+        <!-- Tarjeta de Total Premium -->
+        <div class="bg-gradient-to-br from-slate-800 via-slate-800 to-slate-900 rounded-3xl p-8 shadow-xl text-white relative overflow-hidden">
+          <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+          <p class="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-2">Total a Pagar</p>
+          <h2 class="text-5xl font-black text-emerald-400 mb-6 drop-shadow-md">
+            <span class="text-2xl text-emerald-200/50 mr-1">S/.</span>{{ totalAPagar() | number:'1.2-2' }}
+          </h2>
+          <div class="h-px w-full bg-slate-700/50 mb-5"></div>
+          <p class="text-xs font-medium text-slate-400 flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            Paciente: <span class="font-bold text-white uppercase">{{ citaSeleccionada()?.pacienteNombreCompleto }}</span>
+          </p>
         </div>
 
         <!-- Formulario de Pago (Si NO ha pagado) -->
         @if (!pagoActual()) {
-          <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-            <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><span>💳</span> Procesar Pago</h3>
+          <div class="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
+            <h3 class="font-bold text-slate-800 mb-5 flex items-center gap-2"><span>💳</span> Confirmación de Pago</h3>
             
-            <form [formGroup]="pagoForm" (ngSubmit)="procesarPago()" class="space-y-4">
+            <form [formGroup]="pagoForm" (ngSubmit)="procesarPago()" class="space-y-5">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Método de Pago</label>
-                <select formControlName="metodoPago" class="w-full border-2 border-gray-200 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500 font-medium">
+                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Método de Pago</label>
+                <select formControlName="metodoPago" class="w-full border-2 border-slate-200 bg-slate-50 rounded-xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 font-bold text-slate-700 transition-colors">
                   <option value="" disabled>Seleccione...</option>
                   <option value="EFECTIVO">💵 Efectivo</option>
                   <option value="TARJETA">💳 Tarjeta (POS)</option>
@@ -142,8 +187,8 @@
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Comprobante</label>
-                <select formControlName="tipoComprobante" class="w-full border-2 border-gray-200 rounded-lg px-3 py-2 focus:ring-green-500 focus:border-green-500 font-medium">
+                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Comprobante a Emitir</label>
+                <select formControlName="tipoComprobante" class="w-full border-2 border-slate-200 bg-slate-50 rounded-xl px-4 py-3 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 font-bold text-slate-700 transition-colors">
                   <option value="" disabled>Seleccione...</option>
                   <option value="BOLETA">📄 Boleta Electrónica</option>
                   <option value="FACTURA">🧾 Factura</option>
@@ -152,7 +197,7 @@
               </div>
 
               <div class="pt-4">
-                <button type="submit" [disabled]="pagoForm.invalid || tratamientos().length === 0" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-colors disabled:bg-gray-400">
+                <button type="submit" [disabled]="pagoForm.invalid || tratamientos().length === 0" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-black py-4 px-4 rounded-xl shadow-lg shadow-emerald-500/30 transition-all hover:-translate-y-0.5 disabled:bg-slate-300 disabled:shadow-none disabled:transform-none text-lg">
                   Confirmar Cobro
                 </button>
               </div>
@@ -160,21 +205,23 @@
           </div>
         } 
         
-        <!-- Recibo (Si YA pagó) -->
+        <!-- Recibo Electrónico Generado (Si YA pagó) -->
         @else {
-          <div class="bg-green-50 border border-green-200 rounded-xl p-6 shadow-sm text-center">
-            <div class="w-16 h-16 bg-green-500 text-white rounded-full flex items-center justify-center text-3xl mx-auto mb-3 shadow-md">✓</div>
-            <h3 class="text-xl font-bold text-green-800 mb-1">¡Cuenta Pagada!</h3>
-            <p class="text-sm text-green-700 mb-4">{{ pagoActual()?.fechaPago | date:'dd/MM/yyyy h:mm a' }}</p>
+          <div class="bg-gradient-to-b from-emerald-50 to-white border border-emerald-200 rounded-3xl p-8 shadow-sm text-center relative overflow-hidden">
+            <div class="absolute -right-6 -top-6 text-6xl opacity-10 rotate-12">✅</div>
+            <div class="w-20 h-20 bg-emerald-500 text-white rounded-full flex items-center justify-center text-4xl mx-auto mb-4 shadow-lg shadow-emerald-500/40">✓</div>
+            <h3 class="text-2xl font-black text-emerald-800 mb-1">¡Cuenta Pagada!</h3>
+            <p class="text-xs font-bold text-emerald-600/70 uppercase tracking-wider mb-6">{{ pagoActual()?.fechaPago | date:'dd/MM/yyyy h:mm a' }}</p>
             
-            <div class="bg-white rounded p-3 text-left space-y-2 border border-green-100 text-sm">
-              <div class="flex justify-between"><span class="text-gray-500">Método:</span> <span class="font-bold">{{ pagoActual()?.metodoPago }}</span></div>
-              <div class="flex justify-between"><span class="text-gray-500">Comprobante:</span> <span class="font-bold">{{ pagoActual()?.tipoComprobante }}</span></div>
-              <div class="flex justify-between pt-2 border-t border-gray-100"><span class="text-gray-500">Pagado:</span> <span class="font-bold text-green-700">S/. {{ pagoActual()?.montoTotal | number:'1.2-2' }}</span></div>
+            <div class="bg-white rounded-2xl p-5 text-left space-y-3 border border-emerald-100 shadow-sm">
+              <div class="flex justify-between items-center"><span class="text-xs font-bold text-slate-400 uppercase">Método</span> <span class="font-black text-slate-700">{{ pagoActual()?.metodoPago }}</span></div>
+              <div class="flex justify-between items-center"><span class="text-xs font-bold text-slate-400 uppercase">Documento</span> <span class="font-black text-slate-700">{{ pagoActual()?.tipoComprobante }}</span></div>
+              <div class="flex justify-between items-center pt-3 border-t border-slate-100 mt-2"><span class="text-xs font-bold text-slate-400 uppercase">Total Cobrado</span> <span class="font-black text-emerald-600 text-lg">S/. {{ pagoActual()?.montoTotal | number:'1.2-2' }}</span></div>
             </div>
             
-            <button class="mt-4 text-blue-600 font-bold hover:underline text-sm flex items-center justify-center w-full gap-1">
-              <span>🖨️</span> Imprimir Recibo
+            <!-- ====== EVENTO (CLICK) AÑADIDO ====== -->
+            <button (click)="imprimirRecibo()" class="mt-6 text-slate-500 hover:text-blue-600 font-bold hover:underline text-sm flex items-center justify-center w-full gap-2 transition-colors cursor-pointer">
+              <span class="text-xl">🖨️</span> Imprimir Comprobante (Ticket)
             </button>
           </div>
         }

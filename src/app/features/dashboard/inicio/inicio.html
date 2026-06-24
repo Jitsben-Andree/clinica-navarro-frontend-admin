@@ -1,112 +1,334 @@
-<div class="animate-fade-in-up space-y-6">
+<div class="min-h-screen bg-gray-50 p-4 md:p-6 space-y-6">
   
-  <!-- Saludo -->
-  <div>
-    <h2 class="text-2xl font-bold text-gray-800">Resumen del Día</h2>
-    <p class="text-gray-500 text-sm mt-1">Aquí tienes un vistazo rápido de cómo va la clínica hoy.</p>
+  <!-- HEADER EJECUTIVO -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 fade-in">
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-3">
+          <h1 class="text-3xl font-bold text-gray-800">{{ getSaludoPersonalizado() }}</h1>
+          <span class="text-3xl">👋</span>
+        </div>
+        <p class="text-gray-500 mt-1">{{ getFechaFormateada() }}</p>
+      </div>
+      
+      <div class="flex flex-wrap items-center gap-3">
+        <!-- Estado de conexión -->
+        <div class="flex items-center gap-2 px-3 py-1.5 bg-green-50 rounded-lg border border-green-100">
+          <span class="w-2.5 h-2.5 bg-green-500 rounded-full pulse-dot"></span>
+          <span class="text-sm text-green-700 font-medium">En vivo</span>
+        </div>
+        
+        <!-- Última actualización -->
+        <div class="text-sm text-gray-500">
+          <span class="hidden sm:inline">Última actualización: </span>
+          <span class="font-medium">{{ getTiempoActualizacion() }}</span>
+        </div>
+        
+        <!-- Botón actualizar -->
+        <button (click)="cargarDashboard()" 
+                class="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-200 
+                       active:scale-95 flex items-center gap-2 font-medium shadow-sm hover:shadow">
+          <span class="text-lg">⟳</span>
+          <span class="hidden sm:inline">Actualizar</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Resumen ejecutivo -->
+    @if (!cargando()) {
+      <div class="mt-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
+        <div class="flex items-center gap-3">
+          <span class="text-2xl">{{ getResumenEjecutivo().icono }}</span>
+          <div>
+            <p class="text-sm font-medium text-gray-700">Resumen Ejecutivo</p>
+            <p class="text-sm font-semibold" [class]="getResumenEjecutivo().color">
+              {{ getResumenEjecutivo().texto }}
+            </p>
+          </div>
+        </div>
+      </div>
+    }
   </div>
 
-  <!-- TARJETAS DE MÉTRICAS (KPIs) -->
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-    
-    <!-- Tarjeta 1: Citas del Día -->
-    <div class="bg-white rounded-xl p-6 border border-gray-100 shadow-sm flex items-center gap-4 hover:shadow-md transition-shadow relative overflow-hidden">
-      <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-2xl z-10">📅</div>
-      <div class="z-10">
-        <p class="text-sm font-medium text-gray-500">Citas para Hoy</p>
-        <h3 class="text-2xl font-bold text-gray-800">{{ citasHoy().length }}</h3>
+  <!-- KPI CARDS - MÉTRICAS PRINCIPALES -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-6">
+    @for (metrica of metricas(); track metrica.title) {
+      <div class="metric-card bg-white rounded-2xl p-6 shadow-sm border border-gray-100 relative overflow-hidden">
+        <div class="flex items-start justify-between">
+          <div>
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-sm font-medium text-gray-500">{{ metrica.title }}</span>
+              @if (metrica.tooltip) {
+                <div class="relative group cursor-help">
+                  <span class="text-xs text-gray-400 border border-gray-300 rounded-full w-4 h-4 inline-flex items-center justify-center">?</span>
+                  <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-gray-800 text-white text-xs rounded-lg 
+                              opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none whitespace-normal z-50">
+                    {{ metrica.tooltip }}
+                  </div>
+                </div>
+              }
+            </div>
+            @if (cargando() || (metrica.title === 'Total Pacientes' && cargandoPacientes()) || 
+                 (metrica.title === 'Ingresos del Día' && cargandoIngresos())) {
+              <div class="w-24 h-8 bg-gray-200 rounded skeleton-pulse"></div>
+            } @else {
+              <div class="text-2xl font-bold text-gray-800">{{ metrica.value }}</div>
+            }
+            @if (metrica.subtitle) {
+              <p class="text-xs text-gray-500 mt-1">{{ metrica.subtitle }}</p>
+            }
+          </div>
+          <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl" 
+               [class]="metrica.bgColor">
+            {{ metrica.icon }}
+          </div>
+        </div>
+        
+        <!-- Decoración de fondo -->
+        <div class="absolute -right-6 -bottom-6 w-24 h-24 rounded-full opacity-5 pointer-events-none" 
+             [class]="metrica.bgColor"></div>
       </div>
-      <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-blue-50 rounded-full opacity-50 pointer-events-none"></div>
-    </div>
-
-    <!-- Tarjeta 2: Pacientes Faltantes -->
-    <div class="bg-white rounded-xl p-6 border border-gray-100 shadow-sm flex items-center gap-4 hover:shadow-md transition-shadow relative overflow-hidden">
-      <div class="w-14 h-14 bg-yellow-100 rounded-full flex items-center justify-center text-yellow-600 text-2xl z-10">⏳</div>
-      <div class="z-10">
-        <p class="text-sm font-medium text-gray-500">Por Atender</p>
-        <h3 class="text-2xl font-bold text-gray-800">{{ getCitasPendientes() }}</h3>
-      </div>
-      <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-yellow-50 rounded-full opacity-50 pointer-events-none"></div>
-    </div>
-
-    <!-- Tarjeta 3: Total Pacientes -->
-    <div class="bg-white rounded-xl p-6 border border-gray-100 shadow-sm flex items-center gap-4 hover:shadow-md transition-shadow relative overflow-hidden">
-      <div class="w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 text-2xl z-10">👥</div>
-      <div class="z-10">
-        <p class="text-sm font-medium text-gray-500">Total Pacientes</p>
-        <h3 class="text-2xl font-bold text-gray-800">{{ totalPacientes() }}</h3>
-      </div>
-      <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-indigo-50 rounded-full opacity-50 pointer-events-none"></div>
-    </div>
-
-    <!-- Tarjeta 4: Ingresos (Fase 6) -->
-    <div class="bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl p-6 shadow-md flex items-center gap-4 text-white relative overflow-hidden hover:scale-[1.02] transition-transform">
-      <div class="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center text-2xl z-10 backdrop-blur-sm">💰</div>
-      <div class="z-10">
-        <p class="text-sm font-medium text-green-50">Ingresos de Hoy</p>
-        <h3 class="text-2xl font-bold tracking-tight">S/. {{ ingresosHoy() | number:'1.2-2' }}</h3>
-      </div>
-      <div class="absolute top-0 right-0 p-2 opacity-30 text-xs">Fase 6</div>
-    </div>
+    }
   </div>
 
-  <!-- SECCIÓN INFERIOR: AGENDA DEL DÍA -->
-  <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mt-6">
-    <div class="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-      <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
-        <span>⏰</span> Próximas Atenciones de Hoy
-      </h3>
-      <a routerLink="/dashboard/citas" class="text-sm font-semibold text-blue-600 hover:text-blue-800 hover:underline">Ir a la Agenda Completa &rarr;</a>
+  <!-- SECCIÓN DE ESTADÍSTICAS Y GRÁFICOS -->
+  @if (!cargando() && citasHoy().length > 0) {
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+      <!-- Tarjeta de distribución -->
+      <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <h3 class="text-lg font-bold text-gray-800 mb-4">Distribución de Citas</h3>
+        <div class="space-y-4">
+          <!-- Barra de progreso general -->
+          <div>
+            <div class="flex justify-between text-sm mb-1">
+              <span class="text-gray-600">Progreso del día</span>
+              <span class="font-medium text-gray-800">{{ getProgresoDelDia() | number:'1.0-0' }}%</span>
+            </div>
+            <div class="w-full h-2.5 bg-gray-200 rounded-full overflow-hidden">
+              <div class="h-full bg-gradient-to-r from-blue-500 to-indigo-600 progress-bar rounded-full" 
+                   [style.width.%]="getProgresoDelDia()"></div>
+            </div>
+          </div>
+
+          <!-- Estado de citas -->
+          <div class="grid grid-cols-2 gap-4 mt-4">
+            <div class="p-4 bg-green-50 rounded-xl border border-green-100">
+              <div class="flex items-center justify-between">
+                <span class="text-sm font-medium text-green-700">Atendidas</span>
+                <span class="text-2xl font-bold text-green-700">{{ getCitasRealizadas() }}</span>
+              </div>
+              <div class="w-full h-1.5 bg-green-200 rounded-full mt-2">
+                <div class="h-full bg-green-500 rounded-full progress-bar" 
+                     [style.width.%]="((getCitasRealizadas() / citasHoy().length) * 100)"></div>
+              </div>
+            </div>
+            
+            <div class="p-4 bg-yellow-50 rounded-xl border border-yellow-100">
+              <div class="flex items-center justify-between">
+                <span class="text-sm font-medium text-yellow-700">Pendientes</span>
+                <span class="text-2xl font-bold text-yellow-700">{{ getCitasPendientes() }}</span>
+              </div>
+              <div class="w-full h-1.5 bg-yellow-200 rounded-full mt-2">
+                <div class="h-full bg-yellow-500 rounded-full progress-bar" 
+                     [style.width.%]="((getCitasPendientes() / citasHoy().length) * 100)"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tarjeta de estadísticas rápidas -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <h3 class="text-lg font-bold text-gray-800 mb-4">Estadísticas Rápidas</h3>
+        <div class="space-y-3">
+          @for (stat of getEstadisticasAtencion() | keyvalue; track stat.key) {
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+              <span class="text-sm font-medium text-gray-600">
+                {{ stat.key | titlecase }}
+              </span>
+              <span class="text-sm font-bold text-gray-800">{{ stat.value }}%</span>
+            </div>
+          }
+        </div>
+        <div class="mt-4 pt-4 border-t border-gray-100">
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-gray-600">Total pacientes registrados</span>
+            <span class="font-bold text-gray-800">{{ totalPacientes() }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- SECCIÓN DE AGENDA -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden fade-in">
+    <!-- Header de agenda -->
+    <div class="px-6 py-5 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-gradient-to-r from-gray-50 to-white">
+      <div class="flex items-center gap-3">
+        <h3 class="text-xl font-bold text-gray-800">📋 Agenda del Día</h3>
+        @if (!cargando() && citasHoy().length > 0) {
+          <span class="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-semibold rounded-full">
+            {{ citasHoy().length }} citas
+          </span>
+        }
+      </div>
+      
+      <div class="flex flex-wrap items-center gap-3">
+        <!-- Filtros de estado -->
+        <div class="flex gap-1 bg-gray-100 p-1 rounded-xl">
+          <button (click)="cambiarFiltro('TODAS')" 
+                  class="px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-200"
+                  [class.bg-white]="filtroEstado() === 'TODAS'"
+                  [class.shadow-sm]="filtroEstado() === 'TODAS'"
+                  [class.text-gray-700]="filtroEstado() === 'TODAS'"
+                  [class.text-gray-500]="filtroEstado() !== 'TODAS'">
+            Todas
+          </button>
+          <button (click)="cambiarFiltro('PENDIENTE')" 
+                  class="px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-200"
+                  [class.bg-white]="filtroEstado() === 'PENDIENTE'"
+                  [class.shadow-sm]="filtroEstado() === 'PENDIENTE'"
+                  [class.text-yellow-700]="filtroEstado() === 'PENDIENTE'"
+                  [class.text-gray-500]="filtroEstado() !== 'PENDIENTE'">
+            ⏳ Pendientes
+          </button>
+          <button (click)="cambiarFiltro('REALIZADA')" 
+                  class="px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-200"
+                  [class.bg-white]="filtroEstado() === 'REALIZADA'"
+                  [class.shadow-sm]="filtroEstado() === 'REALIZADA'"
+                  [class.text-green-700]="filtroEstado() === 'REALIZADA'"
+                  [class.text-gray-500]="filtroEstado() !== 'REALIZADA'">
+            ✔️ Realizadas
+          </button>
+          <button (click)="cambiarFiltro('CANCELADA')" 
+                  class="px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-200"
+                  [class.bg-white]="filtroEstado() === 'CANCELADA'"
+                  [class.shadow-sm]="filtroEstado() === 'CANCELADA'"
+                  [class.text-red-700]="filtroEstado() === 'CANCELADA'"
+                  [class.text-gray-500]="filtroEstado() !== 'CANCELADA'">
+            ❌ Canceladas
+          </button>
+        </div>
+        
+        <a routerLink="/dashboard/citas" 
+           class="text-sm font-semibold text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1 transition-colors">
+          Ver agenda completa <span>→</span>
+        </a>
+      </div>
     </div>
 
+    <!-- Lista de citas -->
     <div class="p-0">
       @if (cargando()) {
-        <div class="p-10 text-center text-gray-500 flex flex-col items-center">
-          <div class="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-3"></div>
-          Cargando agenda del día...
+        <div class="p-12 text-center">
+          <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p class="text-gray-500">Cargando agenda del día...</p>
         </div>
-      } @else if (citasHoy().length === 0) {
-        <div class="p-12 text-center text-gray-500">
-          <span class="text-4xl block mb-3">🏖️</span>
-          <p class="text-lg font-medium text-gray-600">No hay citas programadas para el día de hoy.</p>
-          <p class="text-sm mt-1">Es un buen momento para organizar inventario o descansar.</p>
+      } @else if (citasFiltradas().length === 0) {
+        <div class="p-12 text-center">
+          @if (citasHoy().length === 0) {
+            <div class="flex flex-col items-center">
+              <span class="text-6xl mb-4">🏖️</span>
+              <h4 class="text-xl font-semibold text-gray-700">Sin citas para hoy</h4>
+              <p class="text-gray-500 mt-1">Disfruta de un día tranquilo o aprovecha para organizar la agenda</p>
+            </div>
+          } @else {
+            <div class="flex flex-col items-center">
+              <span class="text-4xl mb-4">🔍</span>
+              <h4 class="text-xl font-semibold text-gray-700">No hay citas con este filtro</h4>
+              <button (click)="cambiarFiltro('TODAS')" 
+                      class="mt-3 px-4 py-2 text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors">
+                Mostrar todas las citas
+              </button>
+            </div>
+          }
         </div>
       } @else {
         <div class="divide-y divide-gray-100">
-          @for (cita of citasHoy(); track cita.id) {
-            <div class="p-4 hover:bg-blue-50/50 transition-colors flex items-center justify-between gap-4">
+          @for (cita of citasFiltradas(); track cita.id) {
+            <div class="p-4 hover:bg-blue-50/30 transition-all duration-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 hover:scale-[1.002]">
               
-              <!-- Hora -->
-              <div class="flex flex-col items-center justify-center w-20 p-2 bg-blue-50 rounded-lg border border-blue-100">
-                <span class="text-lg font-bold text-blue-800 leading-none">{{ cita.fechaHora | date:'h:mm' }}</span>
-                <span class="text-xs font-bold text-blue-500 uppercase">{{ cita.fechaHora | date:'a' }}</span>
+              <!-- Hora y estado móvil -->
+              <div class="flex items-center gap-4 w-full sm:w-auto">
+                <div class="flex flex-col items-center justify-center w-16 p-2 bg-blue-50 rounded-xl border border-blue-100 flex-shrink-0">
+                  <span class="text-lg font-bold text-blue-800 leading-none">{{ formatearHora(cita.fechaHora) }}</span>
+                  <span class="text-xs font-medium text-blue-500 uppercase">{{ cita.fechaHora | date:'a' }}</span>
+                </div>
+
+                <!-- Info del paciente -->
+                <div class="flex-1 min-w-0">
+                  <h4 class="text-base font-bold text-gray-800 truncate flex items-center gap-2">
+                    {{ cita.pacienteNombreCompleto }}
+                    <span class="text-xs font-normal text-gray-400 hidden sm:inline">#{{ cita.id }}</span>
+                    <!-- Badge estado visible en móvil -->
+                    <span class="sm:hidden px-2 py-0.5 rounded-full text-xs font-medium status-badge" 
+                          [ngClass]="getColorEstado(cita.estado)">
+                      {{ cita.estado }}
+                    </span>
+                  </h4>
+                  <p class="text-sm text-gray-500 truncate flex items-center gap-1">
+                    <span class="text-xs">🦷</span>
+                    <span class="font-medium text-gray-600">Dr. {{ cita.odontologoNombreCompleto }}</span>
+                    <span class="text-gray-300 hidden xs:inline">|</span>
+                    <span class="text-xs text-gray-400 hidden xs:inline">{{ cita.motivo }}</span>
+                  </p>
+                </div>
               </div>
 
-              <!-- Info Paciente -->
-              <div class="flex-1 min-w-0">
-                <h4 class="text-base font-bold text-gray-800 truncate">{{ cita.pacienteNombreCompleto }}</h4>
-                <p class="text-sm text-gray-500 truncate flex items-center gap-1">
-                  <span class="text-xs">🦷</span> Dr. {{ cita.odontologoNombreCompleto }} | {{ cita.motivo }}
-                </p>
-              </div>
+              <!-- Acciones y estado desktop -->
+              <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+                <!-- Estado desktop -->
+                <div class="hidden sm:flex items-center gap-2">
+                  <span class="text-lg">{{ getIconoEstado(cita.estado) }}</span>
+                  <span class="px-3 py-1 rounded-full text-xs font-bold status-badge border" 
+                        [ngClass]="getColorEstado(cita.estado)">
+                    {{ cita.estado }}
+                  </span>
+                </div>
 
-              <!-- Estado -->
-              <div class="hidden md:block">
-                <span class="px-3 py-1 rounded-full text-xs font-bold" [ngClass]="getColorEstado(cita.estado)">
-                  {{ cita.estado }}
-                </span>
-              </div>
-
-              <!-- Botón Acción Directa -->
-              <div>
-                <a routerLink="/dashboard/clinico" class="px-4 py-2 bg-white border border-gray-200 shadow-sm text-sm font-bold text-gray-700 rounded-lg hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 transition-all whitespace-nowrap">
-                  Atender
-                </a>
+                <!-- Botón de acción -->
+                @if (cita.estado === 'PENDIENTE' || cita.estado === 'CONFIRMADA') {
+                  <a routerLink="/dashboard/clinico" 
+                     class="px-4 py-2 bg-blue-600 text-white text-sm font-bold rounded-xl 
+                            hover:bg-blue-700 active:scale-95 transition-all duration-200
+                            shadow-sm hover:shadow flex items-center gap-2 whitespace-nowrap
+                            relative overflow-hidden group">
+                    <span class="relative z-10 flex items-center gap-1">
+                      Atender
+                      <span class="text-base group-hover:translate-x-1 transition-transform">→</span>
+                    </span>
+                    <span class="absolute inset-0 bg-blue-400 opacity-0 group-hover:opacity-20 transition-opacity"></span>
+                  </a>
+                } @else if (cita.estado === 'REALIZADA') {
+                  <span class="px-4 py-2 bg-gray-100 text-gray-500 text-sm font-medium rounded-xl flex items-center gap-2">
+                    <span>✓</span> Atendida
+                  </span>
+                } @else {
+                  <span class="px-4 py-2 bg-gray-100 text-gray-500 text-sm font-medium rounded-xl">
+                    Cancelada
+                  </span>
+                }
               </div>
             </div>
           }
         </div>
       }
     </div>
+
+    <!-- Footer con información adicional -->
+    @if (!cargando() && citasHoy().length > 0) {
+      <div class="px-6 py-4 border-t border-gray-100 bg-gray-50/50 flex flex-wrap justify-between items-center gap-2">
+        <div class="flex items-center gap-4 text-sm text-gray-500">
+          <span>Total: {{ citasHoy().length }}</span>
+          <span class="hidden sm:inline">|</span>
+          <span class="text-green-600">✓ {{ getCitasRealizadas() }} atendidas</span>
+          <span class="text-yellow-600">⏳ {{ getCitasPendientes() }} pendientes</span>
+          <span class="text-red-600">✗ {{ citasHoy().filter(c => c.estado === 'CANCELADA').length }} canceladas</span>
+        </div>
+        <div class="text-xs text-gray-400">
+          Última actualización: {{ getTiempoActualizacion() }}
+        </div>
+      </div>
+    }
   </div>
 </div>
