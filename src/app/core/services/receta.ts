@@ -2,13 +2,15 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Receta } from '../../shared/interfaces/receta.dto';
+import { environment } from '../../../environments/env';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RecetaService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'http://217.216.94.194:8080/api/recetas';
+  private API_URL = `${environment.apiUrl}`
+  private readonly apiUrl = `${this.API_URL}/recetas`;
 
   obtenerPorCita(citaId: number): Observable<Receta> {
     return this.http.get<Receta>(`${this.apiUrl}/cita/${citaId}`);

@@ -1,1 +1,40 @@
-<router-outlet />
+<!-- El router-outlet inyecta las pantallas (Login, Dashboard, etc.) -->
+<router-outlet></router-outlet>
+
+<!-- CONTENEDOR GLOBAL DE NOTIFICACIONES (TOASTS) -->
+<div class="fixed bottom-5 right-5 z-[9999] flex flex-col gap-3 pointer-events-none">
+  
+  @for (toast of toastService.toasts(); track toast.id) {
+    <div class="pointer-events-auto flex items-center gap-4 px-5 py-4 rounded-xl shadow-2xl border transition-all duration-300 transform w-80 animate-fade-in-up"
+         [ngClass]="{
+           'bg-emerald-50 border-emerald-200 text-emerald-800 shadow-emerald-500/20': toast.tipo === 'exito',
+           'bg-rose-50 border-rose-200 text-rose-800 shadow-rose-500/20': toast.tipo === 'error',
+           'bg-blue-50 border-blue-200 text-blue-800 shadow-blue-500/20': toast.tipo === 'info'
+         }">
+      
+      <!-- Icono Dinámico -->
+      <span class="text-2xl drop-shadow-sm">
+        {{ toast.tipo === 'exito' ? '✅' : (toast.tipo === 'error' ? '❌' : 'ℹ️') }}
+      </span>
+      
+      <!-- Texto -->
+      <p class="text-sm font-bold flex-1">{{ toast.mensaje }}</p>
+      
+      <!-- Botón de Cerrar (Opcional, ya que se cierra solo) -->
+      <button (click)="toastService.remover(toast.id)" class="text-gray-400 hover:text-gray-800 transition-colors">
+        ✖
+      </button>
+      
+      <!-- Barra de progreso de tiempo animada -->
+      <div class="absolute bottom-0 left-0 h-1 bg-current opacity-20 rounded-b-xl animate-[shrink_4s_linear_forwards]"></div>
+    </div>
+  }
+</div>
+
+<!-- Pequeña animación CSS en línea para la barra de tiempo del Toast -->
+<style>
+  @keyframes shrink {
+    from { width: 100%; }
+    to { width: 0%; }
+  }
+</style>

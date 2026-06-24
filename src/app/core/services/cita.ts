@@ -2,13 +2,15 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Cita } from '../../shared/interfaces/cita.dto';
+import { environment } from '../../../environments/env';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CitaService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'http://217.216.94.194:8080/api/citas';
+  private API_URL = `${environment.apiUrl}`
+  private readonly apiUrl = `${this.API_URL}/citas`;
 
   listarTodas(): Observable<Cita[]> {
     return this.http.get<Cita[]>(this.apiUrl);

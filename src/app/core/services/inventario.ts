@@ -2,13 +2,15 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { InsumoRequest, InsumoResponse } from '../../shared/interfaces/inventario.dto';
+import { environment } from '../../../environments/env';
 
 @Injectable({
   providedIn: 'root'
 })
 export class InventarioService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'http://217.216.94.194:8080/api/inventario';
+  private API_URL = `${environment.apiUrl}`
+  private readonly apiUrl = `${this.API_URL}/inventario`;
 
   listarTodos(): Observable<InsumoResponse[]> {
     return this.http.get<InsumoResponse[]>(this.apiUrl);

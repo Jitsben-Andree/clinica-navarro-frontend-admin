@@ -1,60 +1,76 @@
-<div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+<div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 animate-fade-in-up">
   
   <!-- Cabecera -->
-  <div class="flex justify-between items-center mb-6">
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
     <div>
-      <h2 class="text-2xl font-bold text-gray-800">Agenda Médica</h2>
-      <p class="text-gray-500 text-sm mt-1">Gestiona las reservas y cambia sus estados (Confirmada, Realizada).</p>
+      <h2 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
+        <span class="p-2 bg-blue-50 text-blue-600 rounded-lg">📅</span> Agenda Médica
+      </h2>
+      <p class="text-slate-500 text-sm mt-1">Gestiona las reservas, marca la llegada de los pacientes y asigna turnos.</p>
     </div>
-    <button (click)="abrirModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium shadow flex items-center gap-2 transition-colors">
-      <span>📅</span> Agendar Nueva Cita
+    <button (click)="abrirModal()" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-bold shadow-md shadow-blue-500/20 flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5">
+      <span>➕</span> Agendar Nueva Cita
     </button>
   </div>
 
   <!-- Tabla de Datos -->
-  <div class="overflow-x-auto">
+  <div class="overflow-x-auto rounded-xl border border-slate-100">
     <table class="w-full text-left border-collapse">
       <thead>
-        <tr class="bg-gray-50 border-b border-gray-200 text-gray-600 text-sm">
-          <th class="p-3 font-semibold">Fecha y Hora</th>
-          <th class="p-3 font-semibold">Paciente</th>
-          <th class="p-3 font-semibold">Odontólogo</th>
-          <th class="p-3 font-semibold">Motivo</th>
-          <th class="p-3 font-semibold">Estado</th>
-          <th class="p-3 font-semibold text-center">Gestión</th>
+        <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 text-xs uppercase tracking-wider">
+          <th class="p-4 font-bold">Fecha y Hora</th>
+          <th class="p-4 font-bold">Paciente</th>
+          <th class="p-4 font-bold">Odontólogo</th>
+          <th class="p-4 font-bold">Motivo</th>
+          <th class="p-4 font-bold text-center">Estado</th>
+          <th class="p-4 font-bold text-center">Gestión Rápida</th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-gray-100">
+      <tbody class="divide-y divide-slate-100 bg-white">
         
         @if (cargando()) {
-          <tr><td colspan="6" class="p-8 text-center text-gray-500">Cargando agenda...</td></tr>
+          <tr><td colspan="6" class="p-12 text-center text-slate-500">
+            <div class="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+            Sincronizando agenda...
+          </td></tr>
         } @else if (citas().length === 0) {
-          <tr><td colspan="6" class="p-8 text-center text-gray-500">No hay citas registradas.</td></tr>
+          <tr><td colspan="6" class="p-12 text-center text-slate-500 italic">No hay citas registradas en el sistema.</td></tr>
         } @else {
           @for (c of citas(); track c.id) {
-            <tr class="hover:bg-blue-50 transition-colors">
-              <td class="p-3 font-semibold text-blue-900">
-                {{ c.fechaHora | date:'dd/MM/yyyy' }} <br>
-                <span class="text-gray-500 text-sm font-normal">{{ c.fechaHora | date:'h:mm a' }}</span>
+            <tr class="hover:bg-slate-50 transition-colors group">
+              <td class="p-4">
+                <div class="font-bold text-slate-800">{{ c.fechaHora | date:'dd/MM/yyyy' }}</div>
+                <div class="text-xs font-bold text-blue-600 bg-blue-50 inline-block px-2 py-0.5 rounded mt-1">{{ c.fechaHora | date:'h:mm a' }}</div>
               </td>
-              <td class="p-3 font-medium text-gray-800">{{ c.pacienteNombreCompleto }}</td>
-              <td class="p-3 text-sm text-gray-600">{{ c.odontologoNombreCompleto }}</td>
-              <td class="p-3 text-sm text-gray-600 truncate max-w-xs">{{ c.motivo }}</td>
-              <td class="p-3">
-                <span class="px-2 py-1 rounded text-xs font-bold border" [ngClass]="getColorEstado(c.estado)">
+              <td class="p-4">
+                <div class="font-bold text-slate-700">{{ c.pacienteNombreCompleto }}</div>
+                <div class="text-xs text-slate-400">ID Paciente: #{{ c.pacienteId }}</div>
+              </td>
+              <td class="p-4 text-sm font-medium text-slate-600">Dr(a). {{ c.odontologoNombreCompleto }}</td>
+              <td class="p-4 text-sm text-slate-500 max-w-[200px] truncate" [title]="c.motivo">{{ c.motivo }}</td>
+              <td class="p-4 text-center">
+                <span class="px-2.5 py-1 rounded-md text-xs font-bold border" [ngClass]="getColorEstado(c.estado)">
                   {{ c.estado }}
                 </span>
               </td>
-              <td class="p-3 text-center">
-                <!-- Dropdown simple para cambiar estado -->
+              <td class="p-4 text-center flex items-center justify-center gap-2">
+                
+                <!-- MAGIA UX: Botón de Check-in Rápido -->
+                @if (c.estado === 'PENDIENTE') {
+                  <button (click)="marcarLlegada(c)" class="bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-200 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1 shadow-sm" title="Marcar como 'En Sala de Espera'">
+                    <span>✅</span> Check-in
+                  </button>
+                }
+
+                <!-- Dropdown simple para otros estados -->
                 <select 
                   [value]="c.estado" 
                   (change)="cambiarEstado(c, $any($event.target).value)"
-                  class="text-xs border-gray-300 rounded p-1 focus:ring-blue-500 focus:border-blue-500 cursor-pointer">
-                  <option value="PENDIENTE">Mover a PENDIENTE</option>
-                  <option value="CONFIRMADA">Mover a CONFIRMADA</option>
-                  <option value="REALIZADA">Mover a REALIZADA</option>
-                  <option value="CANCELADA">Mover a CANCELADA</option>
+                  class="text-xs font-medium border border-slate-200 text-slate-600 bg-white rounded-lg p-1.5 focus:ring-blue-500 focus:border-blue-500 cursor-pointer shadow-sm hover:border-blue-300 transition-colors">
+                  <option value="PENDIENTE">PENDIENTE</option>
+                  <option value="CONFIRMADA">CONFIRMADA (En sala)</option>
+                  <option value="REALIZADA">REALIZADA</option>
+                  <option value="CANCELADA">CANCELADA</option>
                 </select>
               </td>
             </tr>
@@ -67,32 +83,85 @@
 
 <!-- ================= MODAL PARA AGENDAR CITA ================= -->
 @if (mostrarModal()) {
-  <div class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col">
+  <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col animate-fade-in-up">
       
-      <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
-        <h3 class="text-lg font-bold text-gray-800">Agendar Cita</h3>
-        <button (click)="cerrarModal()" class="text-gray-400 hover:text-red-500 font-bold text-xl">&times;</button>
+      <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+        <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+          <span>{{ creandoPacienteRapido() ? '👤 Registro Rápido' : '📅 Nueva Cita' }}</span>
+        </h3>
+        <button (click)="cerrarModal()" class="text-slate-400 hover:text-rose-500 font-bold text-2xl leading-none transition-colors">&times;</button>
       </div>
 
       <div class="p-6">
-        <form [formGroup]="citaForm" id="formCita" (ngSubmit)="guardarCita()" class="space-y-4">
+        
+        <!-- ====== FORMULARIO 1: REGISTRO EXPRESS DE PACIENTE ====== -->
+        @if (creandoPacienteRapido()) {
+          <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-5 mb-4 shadow-sm animate-fade-in-up relative overflow-hidden">
+            <div class="absolute -right-4 -top-4 text-emerald-200 opacity-30 text-6xl">🏃</div>
+            <div class="flex justify-between items-center mb-4 relative z-10">
+              <h4 class="font-bold text-emerald-800 text-sm">Nuevo Paciente Express</h4>
+              <button type="button" (click)="toggleCreacionRapida()" class="text-emerald-600 hover:text-emerald-800 text-xs font-bold bg-white px-2 py-1 rounded border border-emerald-100 shadow-sm transition-colors">Volver a la Cita</button>
+            </div>
+            
+            <form [formGroup]="pacienteRapidoForm" class="grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-10">
+              <div>
+                <label class="block text-xs font-bold text-emerald-700 mb-1">Nombres *</label>
+                <input type="text" formControlName="nombres" class="w-full border border-emerald-200 rounded-lg px-3 py-2 text-sm focus:ring-emerald-500">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-emerald-700 mb-1">Apellidos *</label>
+                <input type="text" formControlName="apellidos" class="w-full border border-emerald-200 rounded-lg px-3 py-2 text-sm focus:ring-emerald-500">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-emerald-700 mb-1">DNI *</label>
+                <input type="text" formControlName="dni" class="w-full border border-emerald-200 rounded-lg px-3 py-2 text-sm focus:ring-emerald-500">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-emerald-700 mb-1">Teléfono</label>
+                <input type="text" formControlName="telefono" class="w-full border border-emerald-200 rounded-lg px-3 py-2 text-sm focus:ring-emerald-500">
+              </div>
+              <div class="sm:col-span-2">
+                <label class="block text-xs font-bold text-emerald-700 mb-1">Correo Electrónico *</label>
+                <input type="email" formControlName="email" class="w-full border border-emerald-200 rounded-lg px-3 py-2 text-sm focus:ring-emerald-500" placeholder="Su cuenta web se creará con este correo">
+              </div>
+              <div class="sm:col-span-2 flex justify-end mt-2">
+                <button type="button" (click)="guardarPacienteRapido()" [disabled]="pacienteRapidoForm.invalid || guardandoPaciente()" class="w-full sm:w-auto bg-emerald-600 text-white font-bold px-5 py-2.5 rounded-lg shadow-md hover:bg-emerald-700 disabled:bg-emerald-400 transition-colors flex items-center justify-center gap-2">
+                  @if (guardandoPaciente()) {
+                    <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Procesando...
+                  } @else {
+                    Guardar y Auto-Seleccionar
+                  }
+                </button>
+              </div>
+            </form>
+          </div>
+        }
+
+        <!-- ====== FORMULARIO 2: CITA NORMAL ====== -->
+        <form [formGroup]="citaForm" id="formCita" (ngSubmit)="guardarCita()" class="space-y-5" [class.hidden]="creandoPacienteRapido()">
           
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Paciente *</label>
-            <select formControlName="pacienteId" class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
-              <option [value]="0" disabled>Seleccione un paciente...</option>
-              @for (p of pacientes(); track p.id) {
-                <option [value]="p.id">{{ p.nombres }} {{ p.apellidos }} (DNI: {{ p.dni }})</option>
-              }
-            </select>
+          <div class="flex items-end gap-3">
+            <div class="flex-1">
+              <label class="block text-sm font-bold text-slate-700 mb-1">Paciente *</label>
+              <select formControlName="pacienteId" class="w-full border-2 border-slate-200 rounded-xl px-4 py-2.5 focus:ring-blue-500 focus:border-blue-500 font-medium bg-slate-50 transition-colors">
+                <option [value]="0" disabled>Seleccione un paciente...</option>
+                @for (p of pacientes(); track p.id) {
+                  <option [value]="p.id">{{ p.nombres }} {{ p.apellidos }} (DNI: {{ p.dni }})</option>
+                }
+              </select>
+            </div>
+            <!-- Botón UX: Fast-Track -->
+            <button type="button" (click)="toggleCreacionRapida()" class="bg-emerald-50 text-emerald-600 border border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300 font-bold px-4 py-2.5 rounded-xl transition-all shadow-sm whitespace-nowrap flex items-center gap-1" title="Crear paciente nuevo rápidamente">
+              <span>➕</span> Nuevo
+            </button>
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Odontólogo *</label>
-            <select formControlName="odontologoId" class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
+            <label class="block text-sm font-bold text-slate-700 mb-1">Odontólogo / Especialista *</label>
+            <select formControlName="odontologoId" class="w-full border-2 border-slate-200 rounded-xl px-4 py-2.5 focus:ring-blue-500 focus:border-blue-500 font-medium bg-slate-50 transition-colors">
               <option [value]="0" disabled>Seleccione el doctor...</option>
-              <!-- Iteración dinámica con la BD Real -->
               @for (doc of odontologos(); track doc.id) {
                 <option [value]="doc.id">Dr(a). {{ doc.nombres }} {{ doc.apellidos }} ({{ doc.especialidadNombre }})</option>
               }
@@ -100,22 +169,28 @@
           </div>
           
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Fecha y Hora *</label>
-            <input type="datetime-local" formControlName="fechaHora" class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-blue-500 focus:border-blue-500">
+            <label class="block text-sm font-bold text-slate-700 mb-1">Fecha y Hora de Atención *</label>
+            <input type="datetime-local" formControlName="fechaHora" class="w-full border-2 border-slate-200 rounded-xl px-4 py-2.5 focus:ring-blue-500 focus:border-blue-500 font-medium transition-colors">
           </div>
           
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Motivo de Consulta *</label>
-            <textarea formControlName="motivo" rows="2" class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Ej: Dolor de muela intensa, Limpieza de rutina..."></textarea>
+            <label class="block text-sm font-bold text-slate-700 mb-1">Motivo Principal de Consulta *</label>
+            <textarea formControlName="motivo" rows="2" class="w-full border-2 border-slate-200 rounded-xl px-4 py-2.5 focus:ring-blue-500 focus:border-blue-500 text-sm transition-colors" placeholder="Ej: Dolor agudo en molar superior derecho..."></textarea>
           </div>
 
         </form>
       </div>
 
-      <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end gap-3">
-        <button (click)="cerrarModal()" type="button" class="px-4 py-2 bg-white border border-gray-300 rounded text-gray-700 hover:bg-gray-100 font-medium">Cancelar</button>
-        <button form="formCita" type="submit" [disabled]="citaForm.invalid" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 font-medium shadow-sm disabled:bg-blue-300">
-          Guardar Cita
+      <div class="px-6 py-4 border-t border-slate-100 bg-slate-50 flex justify-end gap-3">
+        <button (click)="cerrarModal()" type="button" class="px-5 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-700 font-bold hover:bg-slate-100 transition-colors">Cancelar</button>
+        <!-- Spinner y bloqueo del botón al guardar la cita -->
+        <button form="formCita" type="submit" [disabled]="citaForm.invalid || guardandoCita()" class="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-bold shadow-md shadow-blue-500/30 hover:bg-blue-700 disabled:bg-blue-300 disabled:shadow-none transition-all flex items-center gap-2">
+          @if (guardandoCita()) {
+            <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            Procesando...
+          } @else {
+            Confirmar Reserva
+          }
         </button>
       </div>
 

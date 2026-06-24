@@ -4,7 +4,7 @@ export interface Cita {
   pacienteNombreCompleto?: string;
   odontologoId: number;
   odontologoNombreCompleto?: string;
-  fechaHora: string; // Formato ISO "YYYY-MM-DDTHH:mm"
+  fechaHora: string; 
   motivo: string;
   estado?: string;
 }

@@ -7,13 +7,15 @@ import {
   PagoRequest,
   PagoResponse,
 } from '../../shared/interfaces/facturacion.dto';
+import { environment } from '../../../environments/env';
 
 @Injectable({
   providedIn: 'root',
 })
 export class FacturacionService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'http://217.216.94.194:8080/api/facturacion';
+  private API_URL = `${environment.apiUrl}`
+  private readonly apiUrl = `${this.API_URL}/facturacion`;
 
   // --- TRATAMIENTOS ---
   listarTratamientos(citaId: number): Observable<TratamientoResponse[]> {

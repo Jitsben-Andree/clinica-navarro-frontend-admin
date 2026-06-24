@@ -1,7 +1,7 @@
 <!-- Contenedor principal con fondo suave y separación -->
-<div class="flex h-screen bg-slate-100 font-sans overflow-hidden p-4 gap-4 selection:bg-blue-500 selection:text-white">
+<div class="flex h-screen bg-slate-100 font-sans overflow-hidden p-4 gap-4 selection:bg-blue-500 selection:text-white relative">
   
-  <!-- BARRA LATERAL (SIDEBAR) -->
+  <!-- ================= BARRA LATERAL (SIDEBAR) ================= -->
   <aside class="w-72 bg-slate-900 text-white flex flex-col rounded-[2rem] shadow-2xl z-10 relative overflow-hidden border border-slate-800">
     
     <!-- Luces de fondo (Glow effects) -->
@@ -11,7 +11,6 @@
     <!-- Cabecera de la Marca -->
     <div class="relative h-24 flex items-center justify-center border-b border-white/5 bg-white/5 backdrop-blur-md px-6 z-10">
       <div class="flex items-center gap-3.5">
-        <!-- Ícono abstracto de clínica -->
         <div class="flex flex-col gap-1 drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]">
           <div class="w-5 h-3 bg-blue-400 rounded-sm transform -skew-x-12"></div>
           <div class="w-5 h-3 bg-indigo-400 rounded-sm transform -skew-x-12 translate-x-1.5"></div>
@@ -27,118 +26,63 @@
     <nav class="flex-1 px-5 py-6 space-y-1.5 overflow-y-auto custom-scrollbar relative z-10">
       
       <!-- Inicio -->
-      <a
-        routerLink="/dashboard"
-        routerLinkActive="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25 border-white/10"
-        [routerLinkActiveOptions]="{ exact: true }"
-        class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 border border-transparent transition-all duration-300 group text-sm font-semibold tracking-wide"
-      >
-        <svg class="w-5 h-5 transition-transform duration-300 group-hover:scale-110 group-hover:text-blue-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
-        </svg>
+      <a routerLink="/dashboard" routerLinkActive="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25 border-white/10" [routerLinkActiveOptions]="{ exact: true }" class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 border border-transparent transition-all duration-300 group text-sm font-semibold tracking-wide">
+        <span class="text-xl group-hover:scale-110 transition-transform duration-300">🏠</span>
         <span>Inicio</span>
       </a>
 
       <!-- Pacientes -->
-      <a
-        routerLink="/dashboard/pacientes"
-        routerLinkActive="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25 border-white/10"
-        class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 border border-transparent transition-all duration-300 group text-sm font-semibold tracking-wide"
-      >
-        <svg class="w-5 h-5 transition-transform duration-300 group-hover:scale-110 group-hover:text-blue-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-        </svg>
+      <a routerLink="/dashboard/pacientes" routerLinkActive="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25 border-white/10" class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 border border-transparent transition-all duration-300 group text-sm font-semibold tracking-wide">
+        <span class="text-xl group-hover:scale-110 transition-transform duration-300">👥</span>
         <span>Pacientes</span>
       </a>
 
       <!-- Citas -->
-      <a
-        routerLink="/dashboard/citas"
-        routerLinkActive="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25 border-white/10"
-        class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 border border-transparent transition-all duration-300 group text-sm font-semibold tracking-wide"
-      >
-        <svg class="w-5 h-5 transition-transform duration-300 group-hover:scale-110 group-hover:text-blue-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5 21h13.5a2.25 2.25 0 0 0 2.25-2.25m-18 0V7.5M21 7.5v11.25M9 10.5h.008v.008H9V10.5Zm3 0h.008v.008H12V10.5Zm3 0h.008v.008H15V10.5Zm-6 3h.008v.008H9v-.008Zm3 0h.008v.008H12v-.008Zm3 0h.008v.008H15v-.008Zm-6 3h.008v.008H9v-.008Zm3 0h.008v.008H12v-.008Zm3 0h.008v.008H15v-.008Z" />
-        </svg>
+      <a routerLink="/dashboard/citas" routerLinkActive="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25 border-white/10" class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 border border-transparent transition-all duration-300 group text-sm font-semibold tracking-wide">
+        <span class="text-xl group-hover:scale-110 transition-transform duration-300">📅</span>
         <span>Citas y Agenda</span>
       </a>
 
-      @if (rolUsuario === 'ROLE_ADMIN' || rolUsuario === 'ROLE_ODONTOLOGO') {
+      @if (rolUsuario() === 'ROLE_ADMIN' || rolUsuario() === 'ROLE_ODONTOLOGO') {
         <!-- Clínico -->
-        <a
-          routerLink="/dashboard/clinico"
-          routerLinkActive="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25 border-white/10"
-          class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 border border-transparent transition-all duration-300 group text-sm font-semibold tracking-wide"
-        >
-          <svg class="w-5 h-5 transition-transform duration-300 group-hover:scale-110 group-hover:text-blue-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.03 0 1.9.693 2.166 1.638m-7.377 0A48.536 48.536 0 0 1 12 3m0 0c-1.102 0-2.19.037-3.268.108m3.268-1.108c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h1.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664M9 2.25H7.5a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 20.25h5.4M9 12h.008v.008H9V12Zm0 3h.008v.008H9V15Zm0 3h.008v.008H9V18Z" />
-          </svg>
+        <a routerLink="/dashboard/clinico" routerLinkActive="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25 border-white/10" class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 border border-transparent transition-all duration-300 group text-sm font-semibold tracking-wide">
+          <span class="text-xl group-hover:scale-110 transition-transform duration-300">🦷</span>
           <span>Módulo Clínico</span>
         </a>
       }
 
-      @if (rolUsuario === 'ROLE_ADMIN' || rolUsuario === 'ROLE_RECEPCIONISTA') {
+      @if (rolUsuario() === 'ROLE_ADMIN' || rolUsuario() === 'ROLE_RECEPCIONISTA') {
         <!-- Catálogo -->
-        <a
-          routerLink="/dashboard/catalogo"
-          routerLinkActive="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25 border-white/10"
-          class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 border border-transparent transition-all duration-300 group text-sm font-semibold tracking-wide"
-        >
-          <svg class="w-5 h-5 transition-transform duration-300 group-hover:scale-110 group-hover:text-blue-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.854-1.106-2.24 0-3.093 1.123-.865 2.943-.865 4.066 0l.86.665M18.5 12a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z" />
-          </svg>
+        <a routerLink="/dashboard/catalogo" routerLinkActive="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25 border-white/10" class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 border border-transparent transition-all duration-300 group text-sm font-semibold tracking-wide">
+          <span class="text-xl group-hover:scale-110 transition-transform duration-300">🏷️</span>
           <span>Catálogo y Precios</span>
         </a>
       }
 
-      @if (rolUsuario === 'ROLE_ADMIN') {
+      @if (rolUsuario() === 'ROLE_ADMIN') {
         <!-- Personal -->
-        <a
-          routerLink="/dashboard/usuarios"
-          routerLinkActive="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25 border-white/10"
-          class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 border border-transparent transition-all duration-300 group text-sm font-semibold tracking-wide"
-        >
-          <svg class="w-5 h-5 transition-transform duration-300 group-hover:scale-110 group-hover:text-blue-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0A9 9 0 1 0 12 21a9 9 0 0 0 5.982-2.275Zm-5.982-10.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
-          </svg>
+        <a routerLink="/dashboard/usuarios" routerLinkActive="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25 border-white/10" class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 border border-transparent transition-all duration-300 group text-sm font-semibold tracking-wide">
+          <span class="text-xl group-hover:scale-110 transition-transform duration-300">👨‍⚕️</span>
           <span>Personal Médico</span>
         </a>
 
         <!-- Inventario -->
-        <a
-          routerLink="/dashboard/inventario"
-          routerLinkActive="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25 border-white/10"
-          class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 border border-transparent transition-all duration-300 group text-sm font-semibold tracking-wide"
-        >
-          <svg class="w-5 h-5 transition-transform duration-300 group-hover:scale-110 group-hover:text-blue-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-10.5v10.5" />
-          </svg>
+        <a routerLink="/dashboard/inventario" routerLinkActive="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25 border-white/10" class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 border border-transparent transition-all duration-300 group text-sm font-semibold tracking-wide">
+          <span class="text-xl group-hover:scale-110 transition-transform duration-300">📦</span>
           <span>Inventario</span>
         </a>
 
         <!-- Estadísticas -->
-        <a
-          routerLink="/dashboard/resumen"
-          routerLinkActive="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25 border-white/10"
-          class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 border border-transparent transition-all duration-300 group text-sm font-semibold tracking-wide"
-        >
-          <svg class="w-5 h-5 transition-transform duration-300 group-hover:scale-110 group-hover:text-blue-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0 0 20.25 18V6A2.25 2.25 0 0 0 18 3.75H6A2.25 2.25 0 0 0 3.75 6v12A2.25 2.25 0 0 0 6 20.25Z" />
-          </svg>
+        <a routerLink="/dashboard/resumen" routerLinkActive="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25 border-white/10" class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 border border-transparent transition-all duration-300 group text-sm font-semibold tracking-wide">
+          <span class="text-xl group-hover:scale-110 transition-transform duration-300">📊</span>
           <span>Estadísticas</span>
         </a>
       }
 
-      @if (rolUsuario === 'ROLE_ADMIN' || rolUsuario === 'ROLE_RECEPCIONISTA') {
+      @if (rolUsuario() === 'ROLE_ADMIN' || rolUsuario() === 'ROLE_RECEPCIONISTA') {
         <!-- Facturación -->
-        <a
-          routerLink="/dashboard/facturacion"
-          routerLinkActive="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25 border-white/10"
-          class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 border border-transparent transition-all duration-300 group text-sm font-semibold tracking-wide"
-        >
-          <svg class="w-5 h-5 transition-transform duration-300 group-hover:scale-110 group-hover:text-blue-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5zm19.5 0h.008v.008H23.25V18Z" />
-          </svg>
+        <a routerLink="/dashboard/facturacion" routerLinkActive="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25 border-white/10" class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 border border-transparent transition-all duration-300 group text-sm font-semibold tracking-wide">
+          <span class="text-xl group-hover:scale-110 transition-transform duration-300">💳</span>
           <span>Caja y Pagos</span>
         </a>
       }
@@ -148,20 +92,17 @@
     <div class="p-5 border-t border-white/5 bg-white/5 backdrop-blur-md relative z-10">
       <div class="flex items-center gap-3 mb-4 p-3 rounded-2xl bg-slate-800/50 border border-white/5 shadow-inner">
         <div class="w-10 h-10 bg-gradient-to-tr from-blue-500 to-indigo-500 rounded-full flex items-center justify-center shadow-lg font-bold text-sm text-white">
-          {{ emailUsuario.charAt(0).toUpperCase() }}
+          {{ emailUsuario().charAt(0).toUpperCase() }}
         </div>
         <div class="flex-1 min-w-0">
-          <p class="text-sm font-bold text-white truncate" [title]="emailUsuario">{{ emailUsuario }}</p>
+          <p class="text-sm font-bold text-white truncate" [title]="emailUsuario()">{{ emailUsuario() }}</p>
           <p class="text-[11px] text-blue-300 font-semibold tracking-wider mt-0.5 uppercase">
             {{ getNombreRol() }}
           </p>
         </div>
       </div>
 
-      <button
-        (click)="cerrarSesion()"
-        class="w-full flex items-center justify-center gap-2 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 px-4 py-3 rounded-xl text-rose-400 hover:text-rose-300 text-sm font-bold tracking-wide transition-all duration-300"
-      >
+      <button (click)="cerrarSesion()" class="w-full flex items-center justify-center gap-2 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 px-4 py-3 rounded-xl text-rose-400 hover:text-rose-300 text-sm font-bold tracking-wide transition-all duration-300">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
         </svg>
@@ -170,36 +111,134 @@
     </div>
   </aside>
 
-  <!-- CONTENEDOR PRINCIPAL DERECHO -->
+  <!-- ================= CONTENEDOR PRINCIPAL DERECHO ================= -->
   <main class="flex-1 flex flex-col overflow-hidden bg-white rounded-[2rem] shadow-xl border border-slate-200 relative">
     
-    <!-- Cabecera Superior -->
+    <!-- HEADER SUPERIOR (Buscador y Alertas) -->
     <header class="h-20 bg-white/80 backdrop-blur-xl flex items-center justify-between px-8 border-b border-slate-100 z-20 flex-shrink-0">
-      <div>
+      
+      <!-- Lado Izquierdo: Saludo / Título oculto en pantallas chicas -->
+      <div class="hidden lg:block">
         <h2 class="text-xl font-black bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent tracking-tight">
           Panel de Control
         </h2>
-        <p class="text-xs text-slate-400 font-medium mt-1">Gestión clínica y operativa centralizada</p>
+        <p class="text-xs text-slate-400 font-medium mt-1">Gestión clínica centralizada</p>
       </div>
 
-      <div class="flex items-center gap-5">
-        <div class="flex items-center gap-2 bg-emerald-50 border border-emerald-100 px-3.5 py-1.5 rounded-full text-xs text-emerald-600 font-bold tracking-wide shadow-sm">
-          <span class="relative flex h-2.5 w-2.5">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-          </span>
-          <span>En línea</span>
+      <!-- Centro: Buscador Omnipresente -->
+      <div class="flex-1 max-w-lg mx-auto lg:ml-12 lg:mr-8 relative group">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <span class="text-slate-400 group-hover:text-blue-500 transition-colors">🔍</span>
         </div>
+        <input 
+          type="text" 
+          readonly 
+          (click)="abrirBuscador()"
+          placeholder="Buscar pacientes, citas..." 
+          class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-xl pl-10 pr-16 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/50 hover:bg-white hover:shadow-sm transition-all cursor-text"
+        >
+        <!-- Hint del teclado -->
+        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+          <kbd class="hidden sm:inline-block border border-slate-200 rounded px-2 py-0.5 text-[10px] font-bold text-slate-400 bg-white">Ctrl K</kbd>
+        </div>
+      </div>
+
+      <!-- Lado Derecho: Utilidades -->
+      <div class="flex items-center gap-5">
+        
+        <!-- Campana de Notificaciones Proactivas -->
+        <button class="relative p-2 text-slate-400 hover:text-slate-600 transition-colors focus:outline-none">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+          </svg>
+          @if (notificacionesPendientes() > 0) {
+            <span class="absolute top-1 right-1.5 flex h-3 w-3">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500 border-2 border-white"></span>
+            </span>
+          }
+        </button>
+
         <div class="w-px h-6 bg-slate-200"></div>
-        <div class="text-sm text-slate-600 font-semibold bg-slate-50 border border-slate-100 px-5 py-1.5 rounded-full shadow-sm capitalize">
+
+        <!-- Fecha Actual -->
+        <div class="hidden sm:block text-sm text-slate-600 font-semibold bg-slate-50 border border-slate-100 px-5 py-1.5 rounded-full shadow-sm capitalize">
           {{ fechaActual }}
         </div>
       </div>
     </header>
 
     <!-- Área de las Vistas (Routing) -->
-    <div class="flex-1 overflow-auto p-8 bg-slate-50/50 main-scrollbar">
+    <div class="flex-1 overflow-auto p-4 sm:p-8 bg-slate-50/50 main-scrollbar relative">
       <router-outlet></router-outlet>
     </div>
+
   </main>
+
+  <!-- ================= MODAL SPOTLIGHT (Buscador Global) ================= -->
+  @if (mostrarBuscadorGlobal()) {
+    <div class="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4 sm:px-0">
+      <!-- Fondo oscuro difuminado -->
+      <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" (click)="cerrarBuscador()"></div>
+      
+      <!-- Contenedor del Buscador -->
+      <div class="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl overflow-hidden animate-fade-in-up border border-slate-200">
+        
+        <!-- Input Real -->
+        <div class="flex items-center px-4 border-b border-slate-100">
+          <span class="text-blue-500 text-xl">🔍</span>
+          <input 
+            #searchInput
+            type="text" 
+            [(ngModel)]="terminoBusqueda"
+            placeholder="Escribe el DNI, nombre o apellido del paciente..."
+            class="w-full py-5 px-4 text-slate-700 text-lg focus:outline-none bg-transparent placeholder-slate-400"
+          >
+          <button (click)="cerrarBuscador()" class="text-xs font-bold text-slate-400 hover:text-slate-600 bg-slate-100 px-2 py-1 rounded">ESC</button>
+        </div>
+
+        <!-- Área de Resultados Real conectada a BD -->
+        <div class="max-h-96 overflow-y-auto bg-slate-50 p-4">
+          @if (terminoBusqueda().length < 3) {
+            <div class="text-center py-8 text-slate-400">
+              <span class="text-4xl block mb-2">⌨️</span>
+              <p class="text-sm font-medium">Escribe al menos 3 caracteres para buscar pacientes.</p>
+            </div>
+          } @else if (resultadosBusqueda().length === 0) {
+            <div class="text-center py-8 text-slate-400">
+              <span class="text-4xl block mb-2">🤷‍♂️</span>
+              <p class="text-sm font-medium">No se encontró ningún paciente con ese nombre o DNI.</p>
+            </div>
+          } @else {
+            <div class="space-y-2">
+              <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-2">Pacientes Encontrados</h4>
+              
+              @for (paciente of resultadosBusqueda(); track paciente.id) {
+                <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-100 hover:border-blue-300 hover:shadow-md transition-all">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 text-white rounded-full flex items-center justify-center font-bold shadow-sm">
+                      {{ paciente.nombres.charAt(0).toUpperCase() }}
+                    </div>
+                    <div>
+                      <p class="text-sm font-bold text-slate-800">{{ paciente.nombres }} {{ paciente.apellidos }}</p>
+                      <p class="text-xs text-slate-500 font-medium">DNI: {{ paciente.dni }} | Tel: {{ paciente.telefono || 'N/A' }}</p>
+                    </div>
+                  </div>
+                  <div class="flex gap-2">
+                    <button (click)="irAModuloRapido('/dashboard/clinico')" class="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-lg font-bold border border-indigo-100 transition-colors">
+                      🦷 Odontograma
+                    </button>
+                    <button (click)="irAModuloRapido('/dashboard/facturacion')" class="text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-700 px-3 py-1.5 rounded-lg font-bold border border-emerald-100 transition-colors">
+                      💳 Cobrar
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
 </div>

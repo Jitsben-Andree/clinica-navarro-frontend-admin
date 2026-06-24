@@ -2,13 +2,15 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Paciente } from '../../shared/interfaces/paciente.dto';
+import { environment } from '../../../environments/env';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PacienteService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'http://217.216.94.194:8080/api/pacientes';
+  private API_URL = `${environment.apiUrl}`
+  private readonly apiUrl = `${this.API_URL}/pacientes`;
 
   listarTodos(): Observable<Paciente[]> {
     return this.http.get<Paciente[]>(this.apiUrl);

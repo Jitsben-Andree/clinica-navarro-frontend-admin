@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
+import { environment } from '../../../environments/env';
 
 export interface LoginRequest {
   email?: string | null;
@@ -18,7 +19,10 @@ export interface AuthResponse {
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly apiUrl = 'http://217.216.94.194:8080/api/auth'; // RECUERDA CAMBIAR ESTO POR LA IP DE TU VPS
+
+  private API_URL = `${environment.apiUrl}`
+
+  private readonly apiUrl = `${this.API_URL}/auth`; 
   private readonly TOKEN_KEY = 'jwt_token';
 
   constructor(private http: HttpClient) {}

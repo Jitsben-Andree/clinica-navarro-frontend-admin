@@ -2,13 +2,15 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { CatalogoServicio } from '../../shared/interfaces/catalogo.dto';
+import { environment } from '../../../environments/env';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CatalogoService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'http://217.216.94.194:8080/api/catalogo';
+  private API_URL = `${environment.apiUrl}`
+  private readonly apiUrl = `${this.API_URL}/catalogo`;
 
   listarTodos(): Observable<CatalogoServicio[]> {
     return this.http.get<CatalogoServicio[]>(this.apiUrl);
