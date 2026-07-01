@@ -1,6 +1,5 @@
 <div class="animate-fade-in-up">
   
-  <!-- Cabecera -->
   <div class="mb-6 border-b border-slate-100 pb-4">
     <h2 class="text-3xl font-black text-slate-800 flex items-center gap-3">
       <span class="p-2 bg-emerald-50 text-emerald-600 rounded-xl">💳</span> Facturación y Pagos
@@ -8,7 +7,6 @@
     <p class="text-slate-500 text-sm mt-2 font-medium">Sincronización inteligente con el consultorio clínico y procesamiento de cobros.</p>
   </div>
 
-  <!-- Buscadores -->
   <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm mb-6 flex flex-col md:flex-row gap-6 relative z-20">
     <div class="flex-1">
       <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">1. Buscar Paciente</label>
@@ -31,7 +29,6 @@
     </div>
   </div>
 
-  <!-- Área Principal -->
   @if (citaSeleccionada()) {
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 relative" [class.opacity-60]="cargando()">
       
@@ -41,17 +38,18 @@
         </div>
       }
 
-      <!-- COLUMNA IZQUIERDA: Detalle de Tratamientos -->
       <div class="lg:col-span-2 space-y-6">
         
-        <!-- MAGIA UX: Sinergia Clínica (Sugerencias del Odontograma) -->
+        <!-- ============================================== -->
+        <!-- MAGIA UX: CAJA DE INTELIGENCIA CLÍNICA         -->
+        <!-- ============================================== -->
         @if (sugerenciasClinicas().length > 0 && !pagoActual()) {
           <div class="bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-100 rounded-3xl p-6 shadow-sm relative overflow-hidden animate-fade-in-up">
             <div class="absolute -right-6 -top-6 text-7xl opacity-20">🤖</div>
             <h3 class="text-indigo-800 font-black flex items-center gap-2 mb-2 text-lg">
               <span class="text-2xl drop-shadow-sm">✨</span> Sinergia Clínica Detectada
             </h3>
-            <p class="text-sm font-medium text-indigo-600/80 mb-5 max-w-lg">El sistema ha leído el odontograma de este paciente y detectó procedimientos médicos no cobrados. Puedes añadirlos con un clic.</p>
+            <p class="text-sm font-medium text-indigo-600/80 mb-5 max-w-lg">El sistema ha leído el odontograma del paciente y detectó procedimientos médicos que aún no han sido cobrados.</p>
             
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               @for (sug of sugerenciasClinicas(); track sug.pieza) {
@@ -70,7 +68,6 @@
           </div>
         }
 
-        <!-- Formulario Manual para agregar tratamiento (Oculto si ya se pagó) -->
         @if (!pagoActual()) {
           <div class="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
             <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4 flex items-center gap-2">
@@ -99,7 +96,6 @@
           </div>
         }
 
-        <!-- Tabla de Tratamientos (Carrito) -->
         <div class="bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden">
           <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
             <h3 class="font-black text-slate-800">Detalle de la Cuenta (Carrito)</h3>
@@ -150,10 +146,8 @@
 
       </div>
 
-      <!-- COLUMNA DERECHA: Resumen y Pago -->
       <div class="space-y-6">
         
-        <!-- Tarjeta de Total Premium -->
         <div class="bg-gradient-to-br from-slate-800 via-slate-800 to-slate-900 rounded-3xl p-8 shadow-xl text-white relative overflow-hidden">
           <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none"></div>
 
@@ -168,7 +162,6 @@
           </p>
         </div>
 
-        <!-- Formulario de Pago (Si NO ha pagado) -->
         @if (!pagoActual()) {
           <div class="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
             <h3 class="font-bold text-slate-800 mb-5 flex items-center gap-2"><span>💳</span> Confirmación de Pago</h3>
@@ -205,7 +198,6 @@
           </div>
         } 
         
-        <!-- Recibo Electrónico Generado (Si YA pagó) -->
         @else {
           <div class="bg-gradient-to-b from-emerald-50 to-white border border-emerald-200 rounded-3xl p-8 shadow-sm text-center relative overflow-hidden">
             <div class="absolute -right-6 -top-6 text-6xl opacity-10 rotate-12">✅</div>
@@ -219,7 +211,6 @@
               <div class="flex justify-between items-center pt-3 border-t border-slate-100 mt-2"><span class="text-xs font-bold text-slate-400 uppercase">Total Cobrado</span> <span class="font-black text-emerald-600 text-lg">S/. {{ pagoActual()?.montoTotal | number:'1.2-2' }}</span></div>
             </div>
             
-            <!-- ====== EVENTO (CLICK) AÑADIDO ====== -->
             <button (click)="imprimirRecibo()" class="mt-6 text-slate-500 hover:text-blue-600 font-bold hover:underline text-sm flex items-center justify-center w-full gap-2 transition-colors cursor-pointer">
               <span class="text-xl">🖨️</span> Imprimir Comprobante (Ticket)
             </button>

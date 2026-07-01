@@ -19,7 +19,7 @@ import { TratamientoResponse, PagoResponse } from '../../../shared/interfaces/fa
   selector: 'app-facturacion',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  providers: [DatePipe, DecimalPipe], // Inyectamos pipes para formatear en el script
+  providers: [DatePipe, DecimalPipe],
   templateUrl: './facturacion.html'
 })
 export class FacturacionComponent implements OnInit {
@@ -32,7 +32,6 @@ export class FacturacionComponent implements OnInit {
   private toastService = inject(ToastService);
   private fb = inject(FormBuilder);
   
-  // Utilidades para formatear fechas y dinero en el recibo
   private datePipe = inject(DatePipe);
   private decimalPipe = inject(DecimalPipe);
 
@@ -47,6 +46,7 @@ export class FacturacionComponent implements OnInit {
   tratamientos = signal<TratamientoResponse[]>([]);
   pagoActual = signal<PagoResponse | null>(null);
   
+  // MAGIA: Aquí guardaremos lo que el sistema sugiere cobrar
   sugerenciasClinicas = signal<any[]>([]);
   cargando = signal<boolean>(false);
 
@@ -77,7 +77,7 @@ export class FacturacionComponent implements OnInit {
       this.citaSeleccionada.set(null);
       this.tratamientos.set([]);
       this.pagoActual.set(null);
-      this.sugerenciasClinicas.set([]);
+      this.sugerenciasClinicas.set([]); // Limpiamos sugerencias previas
       
       this.citaService.listarPorPaciente(pId).subscribe((citas: Cita[]) => {
         const ordenadas = citas.sort((a: Cita, b: Cita) => new Date(b.fechaHora).getTime() - new Date(a.fechaHora).getTime());
@@ -93,11 +93,14 @@ export class FacturacionComponent implements OnInit {
       this.citaSeleccionada.set(cita);
       this.cargarDetallesFacturacion(citaId);
       
-      // DISPARAMOS LA INTELIGENCIA CLÍNICA
+      // DISPARAMOS LA INTELIGENCIA CLÍNICA AL SELECCIONAR LA CITA
       this.analizarOdontogramaParaSugerencias(this.pacienteSeleccionado()!);
     }
   }
 
+  // ========================================================
+  // LA INTELIGENCIA: Leer Odontograma y emparejar con Catálogo
+  // ========================================================
   analizarOdontogramaParaSugerencias(pacienteId: number) {
     this.clinicoService.obtenerFicha(pacienteId).subscribe({
       next: (ficha) => {
@@ -109,6 +112,7 @@ export class FacturacionComponent implements OnInit {
                 odonto.detalles.forEach(d => {
                   let servicioMatch = null;
                   
+                  // Reglas de negocio: Emparejamos el diagnóstico con el catálogo
                   if (d.estadoDiagnostico === 'Curación' || d.estadoDiagnostico === 'Caries') {
                     servicioMatch = this.servicios().find(s => s.nombre.toLowerCase().includes('resina') || s.nombre.toLowerCase().includes('curación'));
                   } else if (d.estadoDiagnostico === 'Extracción Indicada') {
@@ -118,6 +122,7 @@ export class FacturacionComponent implements OnInit {
                   }
 
                   if (servicioMatch) {
+                    // Verificamos que no se lo hayamos cobrado ya en esta cita
                     const yaCobrado = this.tratamientos().some(t => t.servicioId === servicioMatch?.id && t.observaciones?.includes(`Pieza ${d.numeroPieza}`));
                     
                     if (!yaCobrado) {
@@ -141,8 +146,9 @@ export class FacturacionComponent implements OnInit {
       observaciones: `Pieza ${sug.pieza} (${sug.estado})`
     });
     this.agregarTratamiento();
+    
+    // Lo quitamos de la lista de sugerencias porque ya lo agregó al carrito
     this.sugerenciasClinicas.update(list => list.filter(s => s !== sug));
-    this.toastService.mostrar('info', `Sugerencia clínica añadida a la boleta.`);
   }
 
   onServicioChange(event: Event): void {
@@ -200,6 +206,9 @@ export class FacturacionComponent implements OnInit {
         this.tratamientos.update(lista => lista.filter(t => t.id !== id));
         this.cargando.set(false);
         this.toastService.mostrar('info', 'Servicio eliminado correctamente.');
+        
+        // Volvemos a analizar por si borró algo que deberíamos sugerir de nuevo
+        this.analizarOdontogramaParaSugerencias(this.pacienteSeleccionado()!);
       },
       error: (err) => {
         this.toastService.mostrar('error', err.error?.message || 'Error al eliminar.');
@@ -225,6 +234,9 @@ export class FacturacionComponent implements OnInit {
         this.pagoActual.set(pago);
         this.cargando.set(false);
         this.toastService.mostrar('exito', '¡Pago procesado con éxito!');
+        
+        // Al procesar el pago, cambiamos el estado de la cita a REALIZADA
+        this.citaService.cambiarEstado(this.citaSeleccionada()!.id!, 'REALIZADA').subscribe();
       },
       error: (err) => {
         this.toastService.mostrar('error', err.error?.message || 'Error al procesar pago.');
@@ -233,18 +245,13 @@ export class FacturacionComponent implements OnInit {
     });
   }
 
-  // ==========================================
-  // GENERADOR DE RECIBO (TICKET)
-  // ==========================================
   imprimirRecibo(): void {
     const pago = this.pagoActual();
     const cita = this.citaSeleccionada();
-    
     if (!pago || !cita) return;
 
     const fechaFormateada = this.datePipe.transform(pago.fechaPago, 'dd/MM/yyyy h:mm a') || '';
     
-    // Generar las filas de los tratamientos
     let filasTratamientos = '';
     this.tratamientos().forEach(t => {
       const precio = this.decimalPipe.transform(t.precioCobrado, '1.2-2');
@@ -258,14 +265,12 @@ export class FacturacionComponent implements OnInit {
       `;
     });
 
-    // Crear una ventana emergente para impresión
     const ventana = window.open('', 'Imprimir Recibo', 'height=600,width=800');
     if (!ventana) {
-      this.toastService.mostrar('error', 'El navegador bloqueó la ventana emergente. Por favor permita las ventanas emergentes.');
+      this.toastService.mostrar('error', 'El navegador bloqueó la ventana emergente.');
       return;
     }
 
-    // HTML del ticket (Estilo Ticketera / Minimalista)
     const htmlTicket = `
       <!DOCTYPE html>
       <html lang="es">
@@ -287,7 +292,6 @@ export class FacturacionComponent implements OnInit {
       </head>
       <body>
         <div class="ticket">
-          
           <div class="header">
             <h1>CLÍNICA NAVARRO</h1>
             <p>RUC: 20123456789</p>
@@ -295,13 +299,11 @@ export class FacturacionComponent implements OnInit {
             <h3 style="margin: 15px 0 0 0;">${pago.tipoComprobante} DE PAGO</h3>
             <p>Ticket #${pago.id.toString().padStart(6, '0')}</p>
           </div>
-
           <div class="info-cliente">
             <strong>Fecha:</strong> ${fechaFormateada}<br>
             <strong>Paciente:</strong> ${cita.pacienteNombreCompleto}<br>
             <strong>Método de Pago:</strong> ${pago.metodoPago}
           </div>
-
           <table>
             <thead>
               <tr>
@@ -309,26 +311,20 @@ export class FacturacionComponent implements OnInit {
                 <th style="text-align: right; padding-bottom: 10px; border-bottom: 1px solid #111;">Importe</th>
               </tr>
             </thead>
-            <tbody>
-              ${filasTratamientos}
-            </tbody>
+            <tbody>${filasTratamientos}</tbody>
           </table>
-
           <div class="totales">
             <p style="margin: 0 0 5px 0;">Subtotal: S/. ${this.decimalPipe.transform(pago.montoTotal, '1.2-2')}</p>
             <h2>TOTAL: S/. ${this.decimalPipe.transform(pago.montoTotal, '1.2-2')}</h2>
           </div>
-
           <div class="footer">
             <p>¡Gracias por confiar en nosotros!</p>
             <p>Atendido por: Recepción</p>
-            <p style="font-size: 10px; margin-top: 20px; color:#aaa;">Generado electrónicamente por el sistema</p>
+            <p style="font-size: 10px; margin-top: 20px; color:#aaa;">Generado electrónicamente</p>
           </div>
-
         </div>
         <script>
-          // Imprime y cierra la ventana automáticamente
-          window.onload = function() {
+          window.onload = function() {a
             window.print();
             setTimeout(function() { window.close(); }, 500);
           }
@@ -336,7 +332,6 @@ export class FacturacionComponent implements OnInit {
       </body>
       </html>
     `;
-
     ventana.document.write(htmlTicket);
     ventana.document.close();
   }
