@@ -13,10 +13,11 @@ import { FacturacionComponent } from './features/dashboard/facturacion/facturaci
 import { ResumenComponent } from './features/dashboard/resumen/resumen';
 import { UsuariosComponent } from './features/dashboard/usuarios/usuarios';
 import { InventarioComponent } from './features/dashboard/inventario/inventario';
+import { noAuthGuard } from './core/guards/login-auth-no';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'auth', pathMatch: 'full' },
-  { path: 'auth', component: AuthComponent },
+  { path: 'auth', component: AuthComponent, canActivate: [noAuthGuard] },
   
   { 
     path: 'dashboard', 
