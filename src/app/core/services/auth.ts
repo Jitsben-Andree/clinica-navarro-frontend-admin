@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/env';
+import { isPlatformBrowser } from '@angular/common';
 
 export interface LoginRequest {
   email?: string | null;
@@ -20,17 +21,20 @@ export interface AuthResponse {
 })
 export class AuthService {
 
-  private API_URL = `${environment.apiUrl}`
-
+  private API_URL = `${environment.apiUrl}`;
   private readonly apiUrl = `${this.API_URL}/auth`; 
   private readonly TOKEN_KEY = 'jwt_token';
 
-  constructor(private http: HttpClient) {}
+  // Inyectamos PLATFORM_ID aquí
+  constructor(
+    private http: HttpClient,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {}
 
   login(credentials: LoginRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials).pipe(
       tap((response) => {
-        if (typeof window !== 'undefined') {
+        if (isPlatformBrowser(this.platformId)) {
           this.guardarToken(response.token);
           localStorage.setItem('user_role', response.rol);
         }
@@ -39,27 +43,27 @@ export class AuthService {
   }
 
   guardarToken(token: string): void {
-    if (typeof window !== 'undefined') {
+    if (isPlatformBrowser(this.platformId)) {
       localStorage.setItem(this.TOKEN_KEY, token);
     }
   }
 
   obtenerToken(): string | null {
-    if (typeof window !== 'undefined') {
+    if (isPlatformBrowser(this.platformId)) {
       return localStorage.getItem(this.TOKEN_KEY);
     }
     return null;
   }
 
   estaLogueado(): boolean {
-    if (typeof window !== 'undefined') {
+    if (isPlatformBrowser(this.platformId)) {
       return this.obtenerToken() !== null;
     }
     return false;
   }
 
   cerrarSesion(): void {
-    if (typeof window !== 'undefined') {
+    if (isPlatformBrowser(this.platformId)) {
       localStorage.removeItem(this.TOKEN_KEY);
       localStorage.removeItem('user_role');
     }
